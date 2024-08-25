@@ -14,7 +14,6 @@ INTERNAL_IPS = [
 INSTALLED_APPS+=['debug_toolbar','drf_spectacular',]
 
 MIDDLEWARE += [
-    
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
