@@ -26,9 +26,10 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', include('core.urls')),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
+    path('', include('core.urls')),
+    path('',include('properties.urls'))
 ]
 
 if settings.DEBUG:

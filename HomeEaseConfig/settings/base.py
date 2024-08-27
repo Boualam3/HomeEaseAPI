@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'djoser',
     #local apps
     'core',
+    'properties'
 ]
 
 MIDDLEWARE = [
