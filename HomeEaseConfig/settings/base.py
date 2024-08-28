@@ -32,8 +32,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'rest_framework',
     'djoser',
-    #local apps
-    'core',
+    # local apps
+    'core.apps.CoreConfig',  # for load signals
     'properties'
 ]
 
@@ -66,8 +66,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "HomeEaseConfig.wsgi.application"
-
-
 
 
 # Password validation
@@ -112,7 +110,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-
 AUTH_USER_MODEL = 'core.User'
 
 # rest framework settings
@@ -127,7 +124,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-#generetae docs for api
+# generetae docs for api
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Home Ease API',
     'DESCRIPTION': 'Your project description',
@@ -152,7 +149,7 @@ SIMPLE_JWT = {
 
 
 DJOSER = {
-	# 'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    # 'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     # 'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
     # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
     # 'SEND_ACTIVATION_EMAIL': True,
