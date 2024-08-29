@@ -67,3 +67,4 @@ class PropertyImage(models.Model):
         upload_to='upload/images',
         # validators=[validate_file_size]
     )
+

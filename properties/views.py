@@ -12,4 +12,3 @@ class PropertyImageViewSet(ModelViewSet):
 
     def get_queryset(self):
         return PropertyImage.objects.filter(property_id=self.kwargs['property_pk'])
-

@@ -16,7 +16,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    images = PropertyImageSerializer(many=True, read_only=True)
+    images = PropertyImageSerializer(many=True, read_only=True)#many list queryset , read only for get request
 
     class Meta:
         model = Property
