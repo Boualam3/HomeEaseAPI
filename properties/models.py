@@ -1,4 +1,5 @@
-from unicodedata import category
+from core.models import Profile
+
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -24,6 +25,9 @@ class Collection(models.Model):
     featured_property = models.ForeignKey(
         'Property', on_delete=models.SET_NULL, null=True, related_name='+', blank=True
     )
+    host = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name='collections'
+    )
     image = models.ImageField(
         upload_to='upload/collection_images/', null=True, blank=True)
 
@@ -42,7 +46,9 @@ class Property(models.Model):
         APARTMENT = 'APARTMENT', 'Apartment'
         CABIN = 'CABIN', 'Cabin'
         TENT = 'TENT', 'Tent'
-
+    host = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name='properties'
+    )
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
     description = models.TextField()

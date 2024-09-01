@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -7,11 +8,12 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend as FilterBackend
 from .serializers import CollectionSerializer, PropertyImageSerializer, PropertySerializer
 from .models import Collection, Property, PropertyImage
-from .permissions import IsHostReadOnly
+from .permissions import IsHostReadOnly, IsOwnerOrReadOnly
 
 
 class PropertyImageViewSet(ModelViewSet):
     serializer_class = PropertyImageSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get_serializer_context(self):
         return {'property_id': self.kwargs['property_pk']}
@@ -23,7 +25,7 @@ class PropertyImageViewSet(ModelViewSet):
 class PropertyViewSet(ModelViewSet):
     queryset = Property.objects.prefetch_related('images').all()
     serializer_class = PropertySerializer
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     filter_backends = [FilterBackend, SearchFilter, OrderingFilter]
 
     # pagination_class = DefaultPagination
@@ -46,17 +48,22 @@ class PropertyViewSet(ModelViewSet):
         return {'request': self.request}
 
     def destroy(self, request, *args, **kwargs):
-        pass
-        # before delete the object check if it is associated with appointment or order , booking
-        # user cannot deleted till make it not available if so ,whether is assoiceted or nor will delete
+        propert = get_object_or_404(Property, pk=kwargs['pk'])
+
+        # properti shouldn't be associated with any appointments to delete it
+        # if propert.(instance_model).exists():
+        #     return Response({'error': 'Property cannot be deleted as it is associated with an appointment'},
+        #                     status=status.HTTP_400_BAD_REQUEST)
+
+        # if no associations exist, proceed with deletion
+        # return super().destroy(request, *args, **kwargs)
 
 
 class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(
         properties_count=Count('properties')).all()
     serializer_class = CollectionSerializer
-    # TODO will add custom premission allow only Hoster to post/delete/update collection , likewise guest will be allowed to  view collections
-    permission_classes = [IsHostReadOnly]
+    permission_classes = [IsHostReadOnly, IsOwnerOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
         # in deletion ,collection should be not associated with properties othewise will not delete
