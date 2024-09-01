@@ -16,8 +16,6 @@ class ProfileViewSet(ModelViewSet):
     # overrides the permissions in 'GET' and 'PUT' methods  in decorators below by adding another permission IsAuthenticated
     @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        # like destructuring in js
-        # get_or_create return tuple we unpack for get first value below
         profile = Profile.objects.get(
             user_id=request.user.id)
 
