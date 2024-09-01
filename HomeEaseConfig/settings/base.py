@@ -31,10 +31,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'rest_framework',
+    'django_filters',
     'djoser',
     # local apps
     'core.apps.CoreConfig',  # for load signals
-    'properties'
+    'properties',
 ]
 
 MIDDLEWARE = [
@@ -115,16 +116,17 @@ AUTH_USER_MODEL = 'core.User'
 # rest framework settings
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # 'PAGE_SIZE': 10
-
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    # auth
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # documentation
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# generetae docs for api
+# generate docs for api
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Home Ease API',
     'DESCRIPTION': 'Your project description',

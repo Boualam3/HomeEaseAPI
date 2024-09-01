@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Property, PropertyImage, Collection
+from .models import Category, Property, PropertyImage, Collection
 
 # will use like that `serializer = PropertyImageSerializer(data=image_data, context={'property_id': property.id})`
 
@@ -16,8 +16,9 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    images = PropertyImageSerializer(many=True, read_only=True)#many list queryset , read only for get request
-
+    # many list queryset , read only for get request
+    images = PropertyImageSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Property
         fields = [
@@ -27,6 +28,7 @@ class PropertySerializer(serializers.ModelSerializer):
             'description',
             'property_type',
             'collection',
+            'category',
             'location',
             'price',
             'number_of_bedrooms',
@@ -46,9 +48,14 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = ['id', 'title', 'featured_property', 'properties']
+        fields = ['id', 'title','image', 'featured_property', 'properties']
         extra_kwargs = {'title': {'required': True}}
 
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'title']
 # class CollectionSerializer(serializers.Serializer):
 #     id = serializers.IntegerField()
 #     title = serializers.CharField(max_length=255)
