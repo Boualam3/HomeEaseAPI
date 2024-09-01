@@ -1,6 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ProfileViewSet
 
-from .views import home
+router = DefaultRouter()
+router.register('profile', ProfileViewSet)
+
 urlpatterns = [
-    path('', home, name='home'),
+    path('',  include(router.urls)),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
 ]

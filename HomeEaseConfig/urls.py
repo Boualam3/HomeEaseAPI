@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
 # from django.views.generic import TemplateView
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -26,23 +26,23 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.jwt')),
     path('', include('core.urls')),
-    path('',include('properties.urls'))
+    path('', include('properties.urls'))
 ]
 
 if settings.DEBUG:
-	urlpatterns+=[ 
-		# degub tool bar
-		path('__debug__/', include('debug_toolbar.urls')),
-		# docs generation
+    urlpatterns += [
+        # degub tool bar
+        path('__debug__/', include('debug_toolbar.urls')),
+        # docs generation
 
         # Generate the OpenAPI schema
         path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
 
 
-        path('api/docs/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-        path('api/docs/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+        path('api/docs/swagger/',
+             SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('api/docs/redoc/',
+             SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
-	]
+    ]
