@@ -18,7 +18,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 class PropertySerializer(serializers.ModelSerializer):
     # many list queryset , read only for get request
     images = PropertyImageSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Property
         fields = [
@@ -40,15 +40,23 @@ class PropertySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'slug']
 
 
+class SimplePropertySerializer(serializers.ModelSerializer):
+    # maybe will add images , then i view as slide in front-end , for now lets keep it simple
+    class Meta:
+        model = Property
+        fields = ['id', 'title', 'price']
+
+
 class CollectionSerializer(serializers.ModelSerializer):
-    featured_property = PropertySerializer(
+    # we don't use PropertySerializer  coz we need only fewer data and thats what SimplePropertySerializer do ,
+    featured_property = SimplePropertySerializer(
         read_only=True)  # get a specific property
     # lists all properties in the collection
-    properties = PropertySerializer(many=True, read_only=True)
+    properties = SimplePropertySerializer(many=True, read_only=True)
 
     class Meta:
         model = Collection
-        fields = ['id', 'title','image', 'featured_property', 'properties']
+        fields = ['id', 'title', 'image', 'featured_property', 'properties']
         extra_kwargs = {'title': {'required': True}}
 
 

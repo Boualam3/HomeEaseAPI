@@ -5,14 +5,18 @@ from . import views
 
 
 router = routers.DefaultRouter()
-router.register('properties', views.PropertyViewSet, basename='products')
+
+router.register('properties', views.PropertyViewSet, basename='properties')
+
+router.register('collections', views.CollectionViewSet)
+
 
 # parent router that can register child routers which made nested endpoints
 properties_router = routers.NestedDefaultRouter(
     router, 'properties', lookup='property'
 )
 
-# nested endpoint in properties
+# nested endpoint in properties it take id of property to access images properties/id/images
 properties_router.register(
     'images', views.PropertyImageViewSet,  basename='property-images'
 )
