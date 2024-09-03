@@ -10,6 +10,8 @@ router.register('properties', views.PropertyViewSet, basename='properties')
 
 router.register('collections', views.CollectionViewSet)
 
+router.register('categories', views.CategoryViewSet)
+
 
 # parent router that can register child routers which made nested endpoints
 properties_router = routers.NestedDefaultRouter(

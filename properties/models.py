@@ -59,7 +59,7 @@ class Property(models.Model):
         Collection, on_delete=models.PROTECT, related_name='properties'
     )
     category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, related_name='properties'
+        Category, on_delete=models.PROTECT, related_name='properties', null=True, blank=True
     )
 
     # TODO location address list , text choices
@@ -71,9 +71,9 @@ class Property(models.Model):
         null=True, blank=True)  # in square feet or meters
     amenities = models.TextField(null=True, blank=True)  # list of amenities
     last_update = models.DateTimeField(auto_now_add=True)
+
     # Note :clean method is just for the admin panel for test purposes
     # will make validation in serializers
-
     def clean(self):
         if self.property_type == self.PropertyType.HOME and not self.number_of_bedrooms:
             raise ValidationError('Number of bedrooms is required for a home.')

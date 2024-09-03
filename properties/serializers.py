@@ -16,6 +16,10 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        host = self.context['host']
+        return Property.objects.create(host=host, **validated_data)
+
     # many list queryset , read only for get request
     images = PropertyImageSerializer(many=True, read_only=True)
 
@@ -41,7 +45,7 @@ class PropertySerializer(serializers.ModelSerializer):
 
 
 class SimplePropertySerializer(serializers.ModelSerializer):
-    # maybe will add images , then i view as slide in front-end , for now lets keep it simple
+    # maybe will add images , then it view as slide in front-end , for now lets keep it simple
     class Meta:
         model = Property
         fields = ['id', 'title', 'price']

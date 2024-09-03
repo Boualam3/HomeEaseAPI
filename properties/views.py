@@ -1,14 +1,17 @@
+from urllib import request
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 from rest_framework import status
+from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend as FilterBackend
-from .serializers import CollectionSerializer, PropertyImageSerializer, PropertySerializer
-from .models import Collection, Property, PropertyImage
-from .permissions import IsHostReadOnly, IsOwnerOrReadOnly
+from .serializers import CategorySerializer, CollectionSerializer, PropertyImageSerializer, PropertySerializer
+from core.models import Profile
+from .models import Category, Collection, Property, PropertyImage
+from .permissions import IsHostOrReadOnly, IsOwnerOrReadOnly
 
 
 class PropertyImageViewSet(ModelViewSet):
@@ -29,13 +32,11 @@ class PropertyViewSet(ModelViewSet):
     filter_backends = [FilterBackend, SearchFilter, OrderingFilter]
 
     # pagination_class = DefaultPagination
-
     search_fields = ['title', 'description', ]
     ordering_fields = ['price', 'last_update']
     # TODO use filterset_class = PropertyFilter instead of filterset_fields
     # https://django-filter.readthedocs.io/en/stable/ref/filterset.html
     filterset_fields = ['category_id']
-
     # def get_queryset(self):
     #     #Ps : simple filtering before going to use django-filter
     #     queryset = Property.objects.all()
@@ -45,7 +46,8 @@ class PropertyViewSet(ModelViewSet):
     #     return queryset
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        host_profile = Profile.objects.get(user=self.request.user)
+        return {'host': host_profile}
 
     def destroy(self, request, *args, **kwargs):
         propert = get_object_or_404(Property, pk=kwargs['pk'])
@@ -63,12 +65,35 @@ class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(
         properties_count=Count('properties')).all()
     serializer_class = CollectionSerializer
-    permission_classes = [IsHostReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsHostOrReadOnly, IsOwnerOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
-        # in deletion ,collection should be not associated with properties othewise will not delete
+        # in deletion ,collection should be not associated with properties otherwise will not delete
         collection = get_object_or_404(Collection.objects.annotate(
             properties_count=Count('properties')), pk=kwargs['pk'])
         if collection.properties.count() > 0:
             return Response({'error': 'Collection cannot be deleted because it has more than one property'})
+        return super().destroy(request, *args, **kwargs)
+
+
+class CategoryViewSet(ModelViewSet):
+    queryset = Category.objects.annotate(
+        properties_count=Count('properties')).all()
+    serializer_class = CategorySerializer
+
+    def get_permissions(self):
+        """
+        Override get_permissions to provide permission handling based on actions
+        """
+        if self.action in ['retrieve', 'list']:
+            return [AllowAny()]
+        elif self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAdminUser()]
+
+    def destroy(self, request, *args, **kwargs):
+        # in deletion ,category should be not associated with properties otherwise will not delete
+        collection = get_object_or_404(Collection.objects.annotate(
+            properties_count=Count('properties')), pk=kwargs['pk'])
+        if collection.properties.count() > 0:
+            return Response({'error': 'Category cannot be deleted because it has more than one property'})
         return super().destroy(request, *args, **kwargs)
