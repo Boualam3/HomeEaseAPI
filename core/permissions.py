@@ -14,9 +14,9 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 class IsProfileOwner(permissions.BasePermission):
     """
-    Object-level  allow owners of a profile object to edit or view it.
+    Object-level allow owners of a profile object to edit or view it.
     """
 
     def has_object_permission(self, request, view, obj):
         # check if the profile's user is the same as the requesting user
-        return obj.user == request.user
+        return bool(request.user and (obj.user == request.user))
