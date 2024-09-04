@@ -8,3 +8,14 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    ports:
+      - 5000:80
+      - 25:25
+    restart: always
+    volumes:
+      - smtp4dev-data:/smtp4dev
+
+volumes:
+  smtp4dev-data:

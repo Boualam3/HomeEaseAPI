@@ -129,9 +129,10 @@ REST_FRAMEWORK = {
 # generate docs for api
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Home Ease API',
-    'DESCRIPTION': 'Your project description',
+    'DESCRIPTION': 'Home Ease API is an open source rest api that provides most functionality will use it as front-end developer to build an awesome application and add it to your portfolio.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True
     # OTHER SETTINGS
 }
 
@@ -151,13 +152,18 @@ SIMPLE_JWT = {
 
 
 DJOSER = {
-    # 'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    # 'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    # 'SEND_ACTIVATION_EMAIL': True,
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
 
     'SERIALIZERS': {
         'user_create': 'core.serializers.CusUserCreateSerializer',
         'current_user': 'core.serializers.CusUserSerializer',
-    }
+    },
+
+    # 'EMAIL': {
+    #     'activation': 'core.email.ActivationEmail'
+    # },
+    'LOGIN_FIELD': 'email',
 }
