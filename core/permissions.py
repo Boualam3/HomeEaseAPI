@@ -19,4 +19,4 @@ class IsProfileOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # check if the profile's user is the same as the requesting user
-        return bool(request.user and (obj.user == request.user))
+        return obj.user == request.user

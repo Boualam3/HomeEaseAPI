@@ -13,17 +13,38 @@ class CusUserCreateSerializer(BaseUserCreateSerializer):
                   'password', 'first_name', 'last_name',]
 
 
-class CusUserSerializer(BaseUserSerializer):
-    class Meta(BaseUserSerializer.Meta):
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
-
-# ===
-
-
 class ProfileSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(read_only=True)
-
     class Meta:
         model = Profile
-        fields = ['id', 'user_id', 'role',
-                  'phone_number', 'street', 'city', 'zip']
+        fields = ['role', 'phone_number', 'street', 'city', 'zip']
+
+
+class CusUserSerializer(BaseUserSerializer):
+    profile = ProfileSerializer()
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile', None)
+        user_instance = super().create(validated_data)
+        # create profile obj when  profile data is provided
+        if profile_data:
+            # we might get request sent without any profile data so we used empty dictionary
+            Profile.objects.create(user=user_instance, **(profile_data or {}))
+        return user_instance
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', None)
+        user_instance = super().update(instance, validated_data)
+
+        # update or create profile if profile data is provided
+        if profile_data:
+            profile, created = Profile.objects.get_or_create(
+                user=user_instance)
+            for attr, value in profile_data.items():
+                setattr(profile, attr, value)
+            profile.save()
+
+        return user_instance
+
+    class Meta(BaseUserSerializer.Meta):
+        fields = ['id', 'username', 'email',
+                  'first_name', 'last_name', 'profile']
