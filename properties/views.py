@@ -28,12 +28,13 @@ class PropertyImageViewSet(ModelViewSet):
 class PropertyViewSet(ModelViewSet):
     queryset = Property.objects.prefetch_related('images').all()
     serializer_class = PropertySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly,
+                          IsHostOrReadOnly, IsOwnerOrReadOnly]
     filter_backends = [FilterBackend, SearchFilter, OrderingFilter]
 
     # pagination_class = DefaultPagination
     search_fields = ['title', 'description', ]
-    ordering_fields = ['price', 'last_update']
+    ordering_fields = ['price', 'last_update', ]
     # TODO use filterset_class = PropertyFilter instead of filterset_fields
     # https://django-filter.readthedocs.io/en/stable/ref/filterset.html
     filterset_fields = ['category_id']
@@ -46,8 +47,11 @@ class PropertyViewSet(ModelViewSet):
     #     return queryset
 
     def get_serializer_context(self):
-        host_profile = Profile.objects.get(user=self.request.user)
-        return {'host': host_profile}
+        # try:
+        hosted_user = Profile.objects.get(user=self.request.user)
+        return {'hosted_user_id': hosted_user.id}
+        # except Profile.DoesNotExist:
+        #     raise ValidationError("Profile for the user does not exist.")
 
     def destroy(self, request, *args, **kwargs):
         propert = get_object_or_404(Property, pk=kwargs['pk'])
@@ -84,6 +88,8 @@ class CategoryViewSet(ModelViewSet):
     def get_permissions(self):
         """
         Override get_permissions to provide permission handling based on actions
+        drf expects list of instances of permissions when we override get_permissions method
+        behind scenes it loop thought list and get class of each instance using 'obj.__class__' 
         """
         if self.action in ['retrieve', 'list']:
             return [AllowAny()]

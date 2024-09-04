@@ -1,5 +1,5 @@
 from core.models import Profile
-
+from django.utils.text import slugify
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -72,14 +72,10 @@ class Property(models.Model):
     amenities = models.TextField(null=True, blank=True)  # list of amenities
     last_update = models.DateTimeField(auto_now_add=True)
 
-    # Note :clean method is just for the admin panel for test purposes
-    # will make validation in serializers
-    def clean(self):
-        if self.property_type == self.PropertyType.HOME and not self.number_of_bedrooms:
-            raise ValidationError('Number of bedrooms is required for a home.')
-        if self.property_type == self.PropertyType.APARTMENT and not self.number_of_bathrooms:
-            raise ValidationError(
-                'Number of bathrooms is required for an apartment.')
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} ({self.get_property_type_display()})"

@@ -2,8 +2,32 @@ openapi: 3.0.3
 info:
   title: Home Ease API
   version: 1.0.0
-  description: Your project description
+  description: Home Ease API is an open source rest api that provides most functionality
+    will use it as front-end developer to build an awesome application and add it
+    to your portfolio.
 paths:
+  /activate/{uid}/{token}/:
+    get:
+      operationId: activate_retrieve
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: uid
+        schema:
+          type: string
+        required: true
+      tags:
+      - activate
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
   /auth/jwt/create/:
     post:
       operationId: auth_jwt_create_create
@@ -16,13 +40,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/TokenObtainPairRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/TokenObtainPairRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/TokenObtainPairRequest'
         required: true
       responses:
         '200':
@@ -43,13 +67,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenRefresh'
+              $ref: '#/components/schemas/TokenRefreshRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenRefresh'
+              $ref: '#/components/schemas/TokenRefreshRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenRefresh'
+              $ref: '#/components/schemas/TokenRefreshRequest'
         required: true
       responses:
         '200':
@@ -70,21 +94,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenVerify'
+              $ref: '#/components/schemas/TokenVerifyRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenVerify'
+              $ref: '#/components/schemas/TokenVerifyRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenVerify'
+              $ref: '#/components/schemas/TokenVerifyRequest'
         required: true
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenVerify'
-          description: ''
+          description: No response body
   /auth/users/:
     get:
       operationId: auth_users_list
@@ -114,13 +134,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CusUserCreate'
+              $ref: '#/components/schemas/CusUserCreateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CusUserCreate'
+              $ref: '#/components/schemas/CusUserCreateRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CusUserCreate'
+              $ref: '#/components/schemas/CusUserCreateRequest'
         required: true
       security:
       - jwtAuth: []
@@ -164,18 +184,6 @@ paths:
         required: true
       tags:
       - auth
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -196,17 +204,6 @@ paths:
         required: true
       tags:
       - auth
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedUser'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedUser'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedUser'
       security:
       - jwtAuth: []
       responses:
@@ -241,13 +238,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Activation'
+              $ref: '#/components/schemas/ActivationRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Activation'
+              $ref: '#/components/schemas/ActivationRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Activation'
+              $ref: '#/components/schemas/ActivationRequest'
         required: true
       security:
       - jwtAuth: []
@@ -281,13 +278,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CusUser'
+              $ref: '#/components/schemas/CusUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CusUser'
+              $ref: '#/components/schemas/CusUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CusUser'
+              $ref: '#/components/schemas/CusUserRequest'
         required: true
       security:
       - jwtAuth: []
@@ -306,13 +303,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedCusUser'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedCusUser'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedCusUser'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
       security:
       - jwtAuth: []
       responses:
@@ -340,13 +337,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
         required: true
       security:
       - jwtAuth: []
@@ -367,13 +364,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
         required: true
       security:
       - jwtAuth: []
@@ -394,13 +391,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PasswordResetConfirm'
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PasswordResetConfirm'
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PasswordResetConfirm'
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
         required: true
       security:
       - jwtAuth: []
@@ -421,13 +418,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SendEmailReset'
+              $ref: '#/components/schemas/SendEmailResetRequest'
         required: true
       security:
       - jwtAuth: []
@@ -448,13 +445,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UsernameResetConfirm'
+              $ref: '#/components/schemas/UsernameResetConfirmRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UsernameResetConfirm'
+              $ref: '#/components/schemas/UsernameResetConfirmRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UsernameResetConfirm'
+              $ref: '#/components/schemas/UsernameResetConfirmRequest'
         required: true
       security:
       - jwtAuth: []
@@ -475,13 +472,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SetPassword'
+              $ref: '#/components/schemas/SetPasswordRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SetPassword'
+              $ref: '#/components/schemas/SetPasswordRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SetPassword'
+              $ref: '#/components/schemas/SetPasswordRequest'
         required: true
       security:
       - jwtAuth: []
@@ -501,13 +498,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SetUsername'
+              $ref: '#/components/schemas/SetUsernameRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SetUsername'
+              $ref: '#/components/schemas/SetUsernameRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SetUsername'
+              $ref: '#/components/schemas/SetUsernameRequest'
         required: true
       security:
       - jwtAuth: []
@@ -548,13 +545,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
         required: true
       security:
       - jwtAuth: []
@@ -602,13 +599,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: '#/components/schemas/CategoryRequest'
         required: true
       security:
       - jwtAuth: []
@@ -634,13 +631,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedCategory'
+              $ref: '#/components/schemas/PatchedCategoryRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedCategory'
+              $ref: '#/components/schemas/PatchedCategoryRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedCategory'
+              $ref: '#/components/schemas/PatchedCategoryRequest'
       security:
       - jwtAuth: []
       responses:
@@ -695,13 +692,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Collection'
+              $ref: '#/components/schemas/CollectionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Collection'
+              $ref: '#/components/schemas/CollectionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Collection'
+              $ref: '#/components/schemas/CollectionRequest'
         required: true
       security:
       - jwtAuth: []
@@ -748,13 +745,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Collection'
+              $ref: '#/components/schemas/CollectionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Collection'
+              $ref: '#/components/schemas/CollectionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Collection'
+              $ref: '#/components/schemas/CollectionRequest'
         required: true
       security:
       - jwtAuth: []
@@ -780,13 +777,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedCollection'
+              $ref: '#/components/schemas/PatchedCollectionRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedCollection'
+              $ref: '#/components/schemas/PatchedCollectionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedCollection'
+              $ref: '#/components/schemas/PatchedCollectionRequest'
       security:
       - jwtAuth: []
       responses:
@@ -812,188 +809,6 @@ paths:
       responses:
         '204':
           description: No response body
-  /profile/:
-    get:
-      operationId: profile_list
-      parameters:
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      tags:
-      - profile
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedProfileList'
-          description: ''
-    post:
-      operationId: profile_create
-      tags:
-      - profile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Profile'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Profile'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Profile'
-      security:
-      - jwtAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-          description: ''
-  /profile/{id}/:
-    get:
-      operationId: profile_retrieve
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this profile.
-        required: true
-      tags:
-      - profile
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-          description: ''
-    put:
-      operationId: profile_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this profile.
-        required: true
-      tags:
-      - profile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Profile'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Profile'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Profile'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-          description: ''
-    patch:
-      operationId: profile_partial_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this profile.
-        required: true
-      tags:
-      - profile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedProfile'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedProfile'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedProfile'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-          description: ''
-    delete:
-      operationId: profile_destroy
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this profile.
-        required: true
-      tags:
-      - profile
-      security:
-      - jwtAuth: []
-      responses:
-        '204':
-          description: No response body
-  /profile/me/:
-    get:
-      operationId: profile_me_retrieve
-      tags:
-      - profile
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-          description: ''
-    put:
-      operationId: profile_me_update
-      tags:
-      - profile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Profile'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Profile'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Profile'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-          description: ''
   /properties/:
     get:
       operationId: properties_list
@@ -1041,13 +856,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Property'
+              $ref: '#/components/schemas/PropertyRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Property'
+              $ref: '#/components/schemas/PropertyRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Property'
+              $ref: '#/components/schemas/PropertyRequest'
         required: true
       security:
       - jwtAuth: []
@@ -1095,13 +910,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Property'
+              $ref: '#/components/schemas/PropertyRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Property'
+              $ref: '#/components/schemas/PropertyRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Property'
+              $ref: '#/components/schemas/PropertyRequest'
         required: true
       security:
       - jwtAuth: []
@@ -1127,13 +942,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedProperty'
+              $ref: '#/components/schemas/PatchedPropertyRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedProperty'
+              $ref: '#/components/schemas/PatchedPropertyRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedProperty'
+              $ref: '#/components/schemas/PatchedPropertyRequest'
       security:
       - jwtAuth: []
       responses:
@@ -1199,13 +1014,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PropertyImage'
+              $ref: '#/components/schemas/PropertyImageRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PropertyImage'
+              $ref: '#/components/schemas/PropertyImageRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PropertyImage'
+              $ref: '#/components/schemas/PropertyImageRequest'
         required: true
       security:
       - jwtAuth: []
@@ -1260,13 +1075,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PropertyImage'
+              $ref: '#/components/schemas/PropertyImageRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PropertyImage'
+              $ref: '#/components/schemas/PropertyImageRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PropertyImage'
+              $ref: '#/components/schemas/PropertyImageRequest'
         required: true
       security:
       - jwtAuth: []
@@ -1296,13 +1111,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedPropertyImage'
+              $ref: '#/components/schemas/PatchedPropertyImageRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedPropertyImage'
+              $ref: '#/components/schemas/PatchedPropertyImageRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedPropertyImage'
+              $ref: '#/components/schemas/PatchedPropertyImageRequest'
       security:
       - jwtAuth: []
       responses:
@@ -1344,6 +1159,18 @@ components:
       required:
       - token
       - uid
+    ActivationRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+      required:
+      - token
+      - uid
     Category:
       type: object
       properties:
@@ -1355,6 +1182,15 @@ components:
           maxLength: 225
       required:
       - id
+      - title
+    CategoryRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 225
+      required:
       - title
     Collection:
       type: object
@@ -1383,6 +1219,19 @@ components:
       - id
       - properties
       - title
+    CollectionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 225
+        image:
+          type: string
+          format: binary
+          nullable: true
+      required:
+      - title
     CusUser:
       type: object
       properties:
@@ -1391,22 +1240,26 @@ components:
           readOnly: true
         username:
           type: string
-          readOnly: true
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
         email:
           type: string
           format: email
-          maxLength: 254
+          readOnly: true
         first_name:
           type: string
           maxLength: 150
         last_name:
           type: string
           maxLength: 150
+        profile:
+          $ref: '#/components/schemas/Profile'
       required:
       - email
       - id
+      - profile
       - username
     CusUserCreate:
       type: object
@@ -1424,9 +1277,6 @@ components:
           type: string
           format: email
           maxLength: 254
-        password:
-          type: string
-          writeOnly: true
         first_name:
           type: string
           maxLength: 150
@@ -1436,7 +1286,56 @@ components:
       required:
       - email
       - id
+      - username
+    CusUserCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - email
       - password
+      - username
+    CusUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        profile:
+          $ref: '#/components/schemas/ProfileRequest'
+      required:
+      - profile
       - username
     PaginatedCategoryList:
       type: object
@@ -1484,29 +1383,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Collection'
-    PaginatedProfileList:
-      type: object
-      required:
-      - count
-      - results
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/Profile'
     PaginatedPropertyImageList:
       type: object
       required:
@@ -1589,104 +1465,74 @@ components:
       - new_password
       - token
       - uid
-    PatchedCategory:
+    PasswordResetConfirmRequest:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - token
+      - uid
+    PatchedCategoryRequest:
+      type: object
+      properties:
         title:
           type: string
+          minLength: 1
           maxLength: 225
-    PatchedCollection:
+    PatchedCollectionRequest:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         title:
           type: string
+          minLength: 1
           maxLength: 225
         image:
           type: string
-          format: uri
+          format: binary
           nullable: true
-        featured_property:
-          allOf:
-          - $ref: '#/components/schemas/SimpleProperty'
-          readOnly: true
-        properties:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimpleProperty'
-          readOnly: true
-    PatchedCusUser:
+    PatchedCusUserRequest:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         username:
           type: string
-          readOnly: true
+          minLength: 1
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-        email:
-          type: string
-          format: email
-          maxLength: 254
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
         first_name:
           type: string
           maxLength: 150
         last_name:
           type: string
           maxLength: 150
-    PatchedProfile:
+        profile:
+          $ref: '#/components/schemas/ProfileRequest'
+    PatchedPropertyImageRequest:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        user_id:
-          type: integer
-          readOnly: true
-        role:
-          $ref: '#/components/schemas/RoleEnum'
-        phone_number:
+        image:
           type: string
-          nullable: true
-          maxLength: 20
-        street:
-          type: string
-          nullable: true
-          maxLength: 225
-        city:
-          type: string
-          nullable: true
-          maxLength: 225
-        zip:
-          type: number
-          format: double
-          maximum: 1000000
-          minimum: -1000000
-          exclusiveMaximum: true
-          exclusiveMinimum: true
-          nullable: true
-    PatchedProperty:
+          format: binary
+    PatchedPropertyRequest:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         title:
           type: string
+          minLength: 1
           maxLength: 255
-        slug:
-          type: string
-          readOnly: true
-          pattern: ^[-a-zA-Z0-9_]+$
         description:
           type: string
+          minLength: 1
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
         collection:
@@ -1696,6 +1542,7 @@ components:
           nullable: true
         location:
           type: string
+          minLength: 1
           maxLength: 255
         price:
           type: number
@@ -1725,44 +1572,9 @@ components:
         amenities:
           type: string
           nullable: true
-        images:
-          type: array
-          items:
-            $ref: '#/components/schemas/PropertyImage'
-          readOnly: true
-    PatchedPropertyImage:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        image:
-          type: string
-          format: uri
-    PatchedUser:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          maxLength: 254
-        id:
-          type: integer
-          readOnly: true
-        username:
-          type: string
-          readOnly: true
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
     Profile:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        user_id:
-          type: integer
-          readOnly: true
         role:
           $ref: '#/components/schemas/RoleEnum'
         phone_number:
@@ -1785,22 +1597,44 @@ components:
           exclusiveMaximum: true
           exclusiveMinimum: true
           nullable: true
-      required:
-      - id
-      - user_id
+    ProfileRequest:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        phone_number:
+          type: string
+          nullable: true
+          maxLength: 20
+        street:
+          type: string
+          nullable: true
+          maxLength: 225
+        city:
+          type: string
+          nullable: true
+          maxLength: 225
+        zip:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+          nullable: true
     Property:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        title:
-          type: string
-          maxLength: 255
         slug:
           type: string
           readOnly: true
           pattern: ^[-a-zA-Z0-9_]+$
+        title:
+          type: string
+          maxLength: 255
         description:
           type: string
         property_type:
@@ -1868,6 +1702,70 @@ components:
       required:
       - id
       - image
+    PropertyImageRequest:
+      type: object
+      properties:
+        image:
+          type: string
+          format: binary
+      required:
+      - image
+    PropertyRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          minLength: 1
+        property_type:
+          $ref: '#/components/schemas/PropertyTypeEnum'
+        collection:
+          type: integer
+        category:
+          type: integer
+          nullable: true
+        location:
+          type: string
+          minLength: 1
+          maxLength: 255
+        price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+        number_of_bedrooms:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        number_of_bathrooms:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        property_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        amenities:
+          type: string
+          nullable: true
+      required:
+      - collection
+      - description
+      - location
+      - price
+      - property_type
+      - title
     PropertyTypeEnum:
       enum:
       - HOME
@@ -1896,6 +1794,15 @@ components:
           format: email
       required:
       - email
+    SendEmailResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
     SetPassword:
       type: object
       properties:
@@ -1906,21 +1813,46 @@ components:
       required:
       - current_password
       - new_password
+    SetPasswordRequest:
+      type: object
+      properties:
+        new_password:
+          type: string
+          minLength: 1
+        current_password:
+          type: string
+          minLength: 1
+      required:
+      - current_password
+      - new_password
     SetUsername:
       type: object
       properties:
         current_password:
           type: string
-        new_username:
+        new_email:
           type: string
-          title: Username
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          pattern: ^[\w.@+-]+$
-          maxLength: 150
+          format: email
+          title: Email
+          maxLength: 254
       required:
       - current_password
-      - new_username
+      - new_email
+    SetUsernameRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+          minLength: 1
+        new_email:
+          type: string
+          format: email
+          minLength: 1
+          title: Email
+          maxLength: 254
+      required:
+      - current_password
+      - new_email
     SimpleProperty:
       type: object
       properties:
@@ -1941,15 +1873,26 @@ components:
       - id
       - price
       - title
+    SimplePropertyRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        price:
+          type: number
+          format: double
+          maximum: 100000000
+          minimum: -100000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+      required:
+      - price
+      - title
     TokenObtainPair:
       type: object
       properties:
-        username:
-          type: string
-          writeOnly: true
-        password:
-          type: string
-          writeOnly: true
         access:
           type: string
           readOnly: true
@@ -1958,8 +1901,20 @@ components:
           readOnly: true
       required:
       - access
-      - password
       - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
       - username
     TokenRefresh:
       type: object
@@ -1967,18 +1922,24 @@ components:
         access:
           type: string
           readOnly: true
+      required:
+      - access
+    TokenRefreshRequest:
+      type: object
+      properties:
         refresh:
           type: string
           writeOnly: true
+          minLength: 1
       required:
-      - access
       - refresh
-    TokenVerify:
+    TokenVerifyRequest:
       type: object
       properties:
         token:
           type: string
           writeOnly: true
+          minLength: 1
       required:
       - token
     User:
@@ -1987,31 +1948,34 @@ components:
         email:
           type: string
           format: email
-          maxLength: 254
+          readOnly: true
         id:
           type: integer
           readOnly: true
-        username:
-          type: string
-          readOnly: true
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
       required:
       - email
       - id
-      - username
     UsernameResetConfirm:
       type: object
       properties:
-        new_username:
+        new_email:
           type: string
-          title: Username
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          pattern: ^[\w.@+-]+$
-          maxLength: 150
+          format: email
+          title: Email
+          maxLength: 254
       required:
-      - new_username
+      - new_email
+    UsernameResetConfirmRequest:
+      type: object
+      properties:
+        new_email:
+          type: string
+          format: email
+          minLength: 1
+          title: Email
+          maxLength: 254
+      required:
+      - new_email
   securitySchemes:
     jwtAuth:
       type: apiKey

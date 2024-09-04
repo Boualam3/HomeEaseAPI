@@ -1,3 +1,4 @@
+from django.utils.text import slugify
 from rest_framework import serializers
 from .models import Category, Property, PropertyImage, Collection
 
@@ -16,9 +17,6 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        host = self.context['host']
-        return Property.objects.create(host=host, **validated_data)
 
     # many list queryset , read only for get request
     images = PropertyImageSerializer(many=True, read_only=True)
@@ -27,8 +25,8 @@ class PropertySerializer(serializers.ModelSerializer):
         model = Property
         fields = [
             'id',
-            'title',
             'slug',
+            'title',
             'description',
             'property_type',
             'collection',
@@ -42,6 +40,16 @@ class PropertySerializer(serializers.ModelSerializer):
             'images'
         ]
         read_only_fields = ['id', 'slug']
+
+    def create(self, validated_data):
+        hosted_user_id = self.context['hosted_user_id']
+        return Property.objects.create(host_id=hosted_user_id, **validated_data)
+
+    def update(self, instance, validated_data):
+        # update slug only when title get changed
+        if 'title' in validated_data and validated_data['title'] != instance.title:
+            validated_data['slug'] = slugify(validated_data['title'])
+        return super().update(instance, validated_data)
 
 
 class SimplePropertySerializer(serializers.ModelSerializer):

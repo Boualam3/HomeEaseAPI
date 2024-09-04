@@ -11,11 +11,7 @@ class IsHostOrReadOnly(permissions.BasePermission):
             return True
 
         if request.user.is_authenticated:
-            try:
-                profile = Profile.objects.get(user_id=request.user.id)
-                return profile.role == Profile.Role.HOST
-            except Profile.DoesNotExist:
-                return False
+            return request.user.profile.role == Profile.Role.HOST
         return False
 
 
