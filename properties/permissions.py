@@ -27,10 +27,10 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         # check is obj instance of models for access to the user object
-        if isinstance(obj, Property) or isinstance(obj, Collection):
+        if isinstance(obj, (Property, Collection)):
             return obj.host.user == request.user
 
         if isinstance(obj, PropertyImage):
-            return obj.property.host.user == request.user
+            return obj.property.host.user == request.user  # True /False
 
         return False

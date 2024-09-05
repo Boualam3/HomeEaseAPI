@@ -32,6 +32,7 @@ class Collection(models.Model):
     )
     image = models.ImageField(
         upload_to='upload/collection_images/', null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
