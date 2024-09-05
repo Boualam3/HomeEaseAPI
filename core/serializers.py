@@ -7,10 +7,27 @@ from .models import Profile
 
 
 class CusUserCreateSerializer(BaseUserCreateSerializer):
-
     class Meta(BaseUserCreateSerializer.Meta):
         fields = ['id', 'username', 'email',
                   'password', 'first_name', 'last_name',]
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile', None)
+        user_instance = super().create(validated_data)
+        # create profile obj when  profile data is provided
+
+        # we might get request sent without any profile data so we used empty dictionary
+        Profile.objects.create(
+            user=user_instance,
+            role=profile_data.get(
+                "role") if profile_data else Profile.Role.GUEST,
+            phone_number=profile_data.get(
+                "phone_number") if profile_data else None,
+            street=profile_data.get("street") if profile_data else None,
+            city=profile_data.get("city") if profile_data else None,
+            zip=profile_data.get("zip") if profile_data else None
+        )
+        return user_instance
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -22,15 +39,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 class CusUserSerializer(BaseUserSerializer):
     profile = ProfileSerializer()
 
-    def create(self, validated_data):
-        profile_data = validated_data.pop('profile', None)
-        user_instance = super().create(validated_data)
-        # create profile obj when  profile data is provided
-        if profile_data:
-            # we might get request sent without any profile data so we used empty dictionary
-            Profile.objects.create(user=user_instance, **(profile_data or {}))
-        return user_instance
-
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', None)
         user_instance = super().update(instance, validated_data)
@@ -38,7 +46,8 @@ class CusUserSerializer(BaseUserSerializer):
         # update or create profile if profile data is provided
         if profile_data:
             profile, created = Profile.objects.get_or_create(
-                user=user_instance)
+                user=user_instance
+            )
             for attr, value in profile_data.items():
                 setattr(profile, attr, value)
             profile.save()
