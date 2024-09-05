@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     # local apps
     'core.apps.CoreConfig',  # for load signals
     'properties',
+    'booking',
 ]
 
 MIDDLEWARE = [

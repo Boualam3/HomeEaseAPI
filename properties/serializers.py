@@ -37,7 +37,8 @@ class PropertySerializer(serializers.ModelSerializer):
             'number_of_bathrooms',
             'property_size',
             'amenities',
-            'images'
+            'images',
+            'availability',
         ]
         read_only_fields = ['id', 'slug']
 

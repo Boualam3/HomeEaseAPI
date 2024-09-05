@@ -2,6 +2,8 @@ from core.models import Profile
 from django.utils.text import slugify
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.timezone import timezone
+
 
 
 def validate_file_size(file):
@@ -26,7 +28,7 @@ class Collection(models.Model):
         'Property', on_delete=models.SET_NULL, null=True, related_name='+', blank=True
     )
     host = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name='collections'
+        Profile, on_delete=models.CASCADE, null=True, related_name='collections', blank=True
     )
     image = models.ImageField(
         upload_to='upload/collection_images/', null=True, blank=True)
@@ -71,6 +73,9 @@ class Property(models.Model):
         null=True, blank=True)  # in square feet or meters
     amenities = models.TextField(null=True, blank=True)  # list of amenities
     last_update = models.DateTimeField(auto_now_add=True)
+    availability = models.BooleanValue(default=False)  #deactivated
+    from_date = models.DateField(default=timezone.now)
+    to_date = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         if not self.slug:
