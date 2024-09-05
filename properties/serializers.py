@@ -1,5 +1,6 @@
 from django.utils.text import slugify
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 from .models import Category, Property, PropertyImage, Collection
 
 # will use like that `serializer = PropertyImageSerializer(data=image_data, context={'property_id': property.id})`
@@ -41,6 +42,18 @@ class PropertySerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'slug']
 
+    def validate(self, data):
+        hosted_user_id = self.context['hosted_user_id']
+        collection = data.get('collection')
+
+        # check if the collection belongs to the host
+        if collection and collection.host_id != hosted_user_id:
+            raise PermissionDenied(
+                detail="You do not have permission to use this collection for the property."
+            )
+
+        return data
+
     def create(self, validated_data):
         hosted_user_id = self.context['hosted_user_id']
         return Property.objects.create(host_id=hosted_user_id, **validated_data)
@@ -65,6 +78,20 @@ class CollectionSerializer(serializers.ModelSerializer):
         read_only=True)  # get a specific property
     # lists all properties in the collection
     properties = SimplePropertySerializer(many=True, read_only=True)
+
+    def validate(self, data):
+        hosted_user_id = self.context.get('hosted_user_id')
+        # permission denied if the current collection does not belong to the host
+        if self.instance and self.instance.host.id != hosted_user_id:
+            raise PermissionDenied(
+                detail="You do not have permission to perform action on this collection."
+            )
+
+        return data
+
+    def create(self, validated_data):
+        hosted_user_id = self.context.get('hosted_user_id')
+        return Collection.objects.create(host_id=hosted_user_id, **validated_data)
 
     class Meta:
         model = Collection
