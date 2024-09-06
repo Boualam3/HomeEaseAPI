@@ -2,7 +2,7 @@ from core.models import Profile
 from django.utils.text import slugify
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.utils.timezone import timezone
+from django.utils import timezone
 
 
 
@@ -73,9 +73,10 @@ class Property(models.Model):
         null=True, blank=True)  # in square feet or meters
     amenities = models.TextField(null=True, blank=True)  # list of amenities
     last_update = models.DateTimeField(auto_now_add=True)
-    availability = models.BooleanValue(default=False)  #deactivated
+    availability = models.BooleanField(default=False)  #deactivated
     from_date = models.DateField(default=timezone.now)
     to_date = models.DateField(default=timezone.now)
+    number_of_guests = models.IntegerField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
