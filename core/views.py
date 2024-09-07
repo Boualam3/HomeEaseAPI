@@ -49,7 +49,9 @@ from rest_framework import status
 import requests
 
 # TODO convert activation from post to get request
-class UserActivationView(APIView):
+
+
+class TempUserActivationView(APIView):
     def get(self, request, uid, token):
         protocol = 'https://' if request.is_secure() else 'http://'
         web_url = protocol + request.get_host()

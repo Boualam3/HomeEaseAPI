@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from rest_framework.routers import DefaultRouter
-from .views import UserActivationView
+from .views import TempUserActivationView
 
 # router = DefaultRouter()
 # router.register('profile', ProfileViewSet)
@@ -8,7 +8,7 @@ from .views import UserActivationView
 urlpatterns = [
     # path('',  include(router.urls)),
     path(r'activate/<str:uid>/<str:token>/',
-         UserActivationView.as_view()),
+         TempUserActivationView.as_view()),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
 ]
