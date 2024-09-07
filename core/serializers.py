@@ -9,7 +9,7 @@ from .models import Profile
 class CusUserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
         fields = ['id', 'username', 'email',
-                  'password', 'first_name', 'last_name',]
+                  'password', 'first_name', 'last_name']
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile', None)

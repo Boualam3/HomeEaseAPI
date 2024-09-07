@@ -165,5 +165,5 @@ DJOSER = {
     # 'EMAIL': {
     #     'activation': 'core.email.ActivationEmail'
     # },
-    'LOGIN_FIELD': '',
+    # 'LOGIN_FIELD': '',
 }
