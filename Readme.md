@@ -7,21 +7,22 @@ Ensure you have the following installed on your machine:
 - [Docker](https://www.docker.com/get-started) (for running the app in a containerized environment)
 - [Docker Compose](https://docs.docker.com/compose/install/) (for managing multi-container Docker applications)
 
-`docker --version`
+```
+docker --version
+```
 output:
 
-```
-Docker version 24.0.7, .....
-```
+`Docker version 24.0.7, .....`
 
 ---
 
-`docker-compose --version`
+```
+docker-compose --version
+```
 output
 
-```
-docker-compose version 1.29.2 .....
-```
+`docker-compose version 1.29.2 .....`
+
 
 ## Running the Application
 
@@ -50,10 +51,10 @@ hit ctrl+C to exit from docker logs
 ### 3. Access the Application
 
 Once the container is running, you can access the application at:
-Development Server: http://localhost:8000
-SMTP Development Server: http://localhost:5000
-API Documentation (Swagger UI): http://localhost:8000/api/docs/swagger/
-API Documentation (ReDoc): http://localhost:8000/api/docs/redoc/
+    - Development Server: [localhost] (http://localhost:8000)
+    - SMTP Development Server: [smtp-server](http://localhost:5000)
+    - API Documentation (Swagger UI): [Swagger] (http://localhost:8000/api/docs/swagger/)
+    - API Documentation (ReDoc): [ReDoc] (http://localhost:8000/api/docs/redoc/)
 
 ### 4. Running Migrations
 
@@ -85,4 +86,6 @@ Development Tips
 
     Logs: To view logs from your running containers, use:
 
-`docker-compose logs`
+```
+docker-compose logs
+```
