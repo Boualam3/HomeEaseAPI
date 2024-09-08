@@ -51,10 +51,10 @@ hit ctrl+C to exit from docker logs
 ### 3. Access the Application
 
 Once the container is running, you can access the application at:
-    - Development Server: [localhost] (http://localhost:8000)
-    - SMTP Development Server: [smtp-server](http://localhost:5000)
-    - API Documentation (Swagger UI): [Swagger] (http://localhost:8000/api/docs/swagger/)
-    - API Documentation (ReDoc): [ReDoc] (http://localhost:8000/api/docs/redoc/)
+- Development Server: [localhost] (http://localhost:8000)
+- SMTP Development Server: [smtp-server](http://localhost:5000)
+- API Documentation (Swagger UI): [Swagger] (http://localhost:8000/api/docs/swagger/)
+- API Documentation (ReDoc): [ReDoc] (http://localhost:8000/api/docs/redoc/)
 
 ### 4. Running Migrations
 
