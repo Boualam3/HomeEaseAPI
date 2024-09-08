@@ -65,7 +65,6 @@ class Property(models.Model):
         Category, on_delete=models.PROTECT, related_name='properties', null=True, blank=True
     )
 
-    # TODO location address list , text choices
     location = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)  # per night
     number_of_bedrooms = models.IntegerField(null=True, blank=True)
@@ -73,6 +72,10 @@ class Property(models.Model):
     property_size = models.IntegerField(
         null=True, blank=True)  # in square feet or meters
     amenities = models.TextField(null=True, blank=True)  # list of amenities
+    availability = models.BooleanField(default=False)  # deactivated
+    from_date = models.DateField(auto_now_add=True)
+    to_date = models.DateField(auto_now_add=True)
+    number_of_guests = models.IntegerField(null=True, blank=True)
     last_update = models.DateTimeField(auto_now_add=True)
     availability = models.BooleanField(default=False)  #deactivated
     from_date = models.DateField(default=timezone.now)
@@ -85,7 +88,7 @@ class Property(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.title} ({self.get_property_type_display()})"
+        return f"{self.title} ({self.property_type})"
 
 
 class PropertyImage(models.Model):
