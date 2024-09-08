@@ -18,7 +18,11 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
-
+    from_date = serializers.DateField(
+        format="%Y-%m-%d", input_formats=["%Y-%m-%d", "%d-%m-%Y"])
+    to_date = serializers.DateField(
+        format="%Y-%m-%d", input_formats=["%Y-%m-%d", "%d-%m-%Y"])
+    
     # many list queryset , read only for get request
     images = PropertyImageSerializer(many=True, read_only=True)
 
@@ -30,6 +34,8 @@ class PropertySerializer(serializers.ModelSerializer):
             'title',
             'description',
             'property_type',
+            'from_date',
+            'to_date',
             'collection',
             'category',
             'location',
@@ -45,12 +51,20 @@ class PropertySerializer(serializers.ModelSerializer):
     def validate(self, data):
         hosted_user_id = self.context['hosted_user_id']
         collection = data.get('collection')
+        from_date = data.get('from_date')
+        to_date = data.get('to_date')
 
-        # check if the collection belongs to the host
+        # check the collection belongs to the host
         if collection and collection.host_id != hosted_user_id:
             raise PermissionDenied(
                 detail="You do not have permission to use this collection for the property."
             )
+
+        # validate to_date , at least one day after from_date
+        if to_date and from_date and to_date <= from_date:
+            raise serializers.ValidationError({
+                'to_date': "The 'to_date' must be at least one day after 'from_date'."
+            })
 
         return data
 
@@ -104,7 +118,10 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'title']
 
-# TODO : Only one review for property with same (property_pk && user_id)
+# TODO : Host also can add review for the guest so it will like that
+# * => Guest for Property (we do  it)
+# * => Host for Guest (not yet) but if we use nested route we should override djoser viewset and add it there
+# * or we will add separate endpoint (no nested ) for reviews handle both cases with restriction in permissions
 
 
 class ReviewSerializer(serializers.ModelSerializer):
