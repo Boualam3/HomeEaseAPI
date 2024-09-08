@@ -22,6 +22,9 @@ properties_router = routers.NestedDefaultRouter(
 properties_router.register(
     'images', views.PropertyImageViewSet,  basename='property-images'
 )
+properties_router.register(
+    'reviews', views.ReviewViewSet, basename="property-reviews"
+)
 
 # router.register(r'images', views.PropertyImageViewSet, basename='property-images')
 

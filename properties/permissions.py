@@ -2,7 +2,7 @@
 from rest_framework import permissions
 
 from core.models import Profile
-from properties.models import Property, PropertyImage, Collection
+from properties.models import Property, PropertyImage, Collection, Review
 
 
 class IsHostOrReadOnly(permissions.BasePermission):
@@ -12,6 +12,49 @@ class IsHostOrReadOnly(permissions.BasePermission):
 
         if request.user.is_authenticated:
             return request.user.profile.role == Profile.Role.HOST
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        """
+        Check if the user has ownership of the object.
+        """
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Property and Collection has host attribute
+        if hasattr(obj, 'host'):
+            return obj.host.user == request.user
+            # raise PermissionDenied(
+            #     "You do not have permission to perform this action")
+
+        # PropertyImage has property attribute ;will add Reviews here it should has property too
+        if hasattr(obj, 'property'):
+            return obj.property.host.user == request.user
+
+        return False
+
+
+class IsGuestOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        if request.user.is_authenticated:
+            return request.user.profile.role == Profile.Role.GUEST
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Allow property host to modify reviews
+        # if hasattr(obj, 'property'):
+        #     return obj.property.host.user == request.user
+
+        # Allow the review owner to update or delete their own review
+        if hasattr(obj, 'profile'):
+            return obj.profile == request.user.profile
+
         return False
 
 
