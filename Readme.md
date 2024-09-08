@@ -34,41 +34,50 @@ git clone  git@github.com:Boualam3/HomeEaseAPI.git
 
 cd HomeEaseAPI/
 
-git checkout master
+git checkout properties_app
 ```
 
 ### 2. Build and Run the Docker Container
 
 To build and run the Docker container, use Docker Compose. This command will build the image and start the container:
 
-`docker-compose up --build`
+```
+docker-compose up --build
+```
+
 hit ctrl+C to exit from docker logs
 
 ### 3. Access the Application
 
 Once the container is running, you can access the application at:
-
-    Development Server: http://localhost:8000
-    API Documentation (Swagger UI): http://localhost:8000/api/docs/swagger/
-    API Documentation (ReDoc): http://localhost:8000/api/docs/redoc/
+Development Server: http://localhost:8000
+SMTP Development Server: http://localhost:5000
+API Documentation (Swagger UI): http://localhost:8000/api/docs/swagger/
+API Documentation (ReDoc): http://localhost:8000/api/docs/redoc/
 
 ### 4. Running Migrations
 
 If you need to apply database migrations, run the following command:
 
-`docker-compose run web python manage.py migrate`
+```
+docker-compose run web python manage.py migrate
+```
 
 ### 5. Creating a Superuser
 
 To create a superuser for accessing the Django admin interface:
 
-`docker-compose run web python manage.py createsuperuser`
+```
+docker-compose run web python manage.py createsuperuser
+```
 
 ### 6. Stopping the Application
 
 To stop the running Docker containers:
 
-`docker-compose down`
+```
+docker-compose down
+```
 
 Development Tips
 
