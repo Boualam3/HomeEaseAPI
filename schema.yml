@@ -184,6 +184,18 @@ paths:
         required: true
       tags:
       - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
       security:
       - jwtAuth: []
       responses:
@@ -204,6 +216,17 @@ paths:
         required: true
       tags:
       - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
       security:
       - jwtAuth: []
       responses:
@@ -840,7 +863,6 @@ paths:
       - properties
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -887,7 +909,6 @@ paths:
       - properties
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1147,6 +1168,181 @@ paths:
       responses:
         '204':
           description: No response body
+  /properties/{property_pk}/reviews/:
+    get:
+      operationId: properties_reviews_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: property_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - properties
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReviewList'
+          description: ''
+    post:
+      operationId: properties_reviews_create
+      parameters:
+      - in: path
+        name: property_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /properties/{property_pk}/reviews/{id}/:
+    get:
+      operationId: properties_reviews_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: property_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - properties
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    put:
+      operationId: properties_reviews_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: property_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    patch:
+      operationId: properties_reviews_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: property_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    delete:
+      operationId: properties_reviews_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: property_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - properties
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
 components:
   schemas:
     Activation:
@@ -1240,14 +1436,13 @@ components:
           readOnly: true
         username:
           type: string
+          readOnly: true
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
-          pattern: ^[\w.@+-]+$
-          maxLength: 150
         email:
           type: string
           format: email
-          readOnly: true
+          maxLength: 254
         first_name:
           type: string
           maxLength: 150
@@ -1319,13 +1514,11 @@ components:
     CusUserRequest:
       type: object
       properties:
-        username:
+        email:
           type: string
+          format: email
           minLength: 1
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          pattern: ^[\w.@+-]+$
-          maxLength: 150
+          maxLength: 254
         first_name:
           type: string
           maxLength: 150
@@ -1335,8 +1528,8 @@ components:
         profile:
           $ref: '#/components/schemas/ProfileRequest'
       required:
+      - email
       - profile
-      - username
     PaginatedCategoryList:
       type: object
       required:
@@ -1429,6 +1622,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Property'
+    PaginatedReviewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
     PaginatedUserList:
       type: object
       required:
@@ -1502,13 +1718,11 @@ components:
     PatchedCusUserRequest:
       type: object
       properties:
-        username:
+        email:
           type: string
+          format: email
           minLength: 1
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-          pattern: ^[\w.@+-]+$
-          maxLength: 150
+          maxLength: 254
         first_name:
           type: string
           maxLength: 150
@@ -1572,6 +1786,20 @@ components:
         amenities:
           type: string
           nullable: true
+    PatchedReviewRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          minLength: 1
+    PatchedUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
     Profile:
       type: object
       properties:
@@ -1778,6 +2006,34 @@ components:
         * `APARTMENT` - Apartment
         * `CABIN` - Cabin
         * `TENT` - Tent
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reviewer_name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+        date:
+          type: string
+          format: date
+          readOnly: true
+      required:
+      - date
+      - description
+      - id
+      - reviewer_name
+    ReviewRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          minLength: 1
+      required:
+      - description
     RoleEnum:
       enum:
       - HOST
@@ -1830,29 +2086,33 @@ components:
       properties:
         current_password:
           type: string
-        new_email:
+        new_username:
           type: string
-          format: email
-          title: Email
-          maxLength: 254
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
       required:
       - current_password
-      - new_email
+      - new_username
     SetUsernameRequest:
       type: object
       properties:
         current_password:
           type: string
           minLength: 1
-        new_email:
+        new_username:
           type: string
-          format: email
           minLength: 1
-          title: Email
-          maxLength: 254
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
       required:
       - current_password
-      - new_email
+      - new_username
     SimpleProperty:
       type: object
       properties:
@@ -1948,34 +2208,54 @@ components:
         email:
           type: string
           format: email
-          readOnly: true
+          maxLength: 254
         id:
           type: integer
           readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
       required:
       - email
       - id
-    UsernameResetConfirm:
+      - username
+    UserRequest:
       type: object
       properties:
-        new_email:
-          type: string
-          format: email
-          title: Email
-          maxLength: 254
-      required:
-      - new_email
-    UsernameResetConfirmRequest:
-      type: object
-      properties:
-        new_email:
+        email:
           type: string
           format: email
           minLength: 1
-          title: Email
           maxLength: 254
       required:
-      - new_email
+      - email
+    UsernameResetConfirm:
+      type: object
+      properties:
+        new_username:
+          type: string
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - new_username
+    UsernameResetConfirmRequest:
+      type: object
+      properties:
+        new_username:
+          type: string
+          minLength: 1
+          title: Username
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - new_username
   securitySchemes:
     jwtAuth:
       type: apiKey

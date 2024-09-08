@@ -8,51 +8,19 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend as FilterBackend
-from .serializers import CategorySerializer, CollectionSerializer, PropertyImageSerializer, PropertySerializer
+
+from properties.pagination import DefaultPagination
+from .serializers import CategorySerializer, CollectionSerializer, PropertyImageSerializer, PropertySerializer, ReviewSerializer
 from rest_framework.exceptions import PermissionDenied
 from core.models import Profile
-from .models import Category, Collection, Property, PropertyImage
-from .permissions import IsHostOrReadOnly, IsOwnerOrReadOnly
+from .models import Category, Collection, Property, PropertyImage, Review
+from .permissions import IsGuestOrReadOnly, IsHostOrReadOnly, IsOwnerOrReadOnly
 
 
-# * We Make this Base class for achieve DRY in update/destroy operations sometimes permissions_classes don't working properly but when we call check_objects_permissions it works
-class BaseOwnershipViewSet(ModelViewSet):
-    """
-    A base viewset that includes ownership checks for update and destroy actions.
-    """
-
-    def check_object_permissions(self, request, obj):
-        """
-        Check if the user has ownership of the object.
-        """
-        super().check_object_permissions(request, obj)
-
-        # Property and Collection has host attribute
-        if hasattr(obj, 'host'):
-            if obj.host.user != request.user:
-                raise PermissionDenied(
-                    "You do not have permission to perform this action (from base).")
-
-        # PropertyImage has property attribute ;will add Reviews here it should has property too
-        if hasattr(obj, 'property'):
-            if obj.property.host.user != request.user:
-                raise PermissionDenied(
-                    "You do not have permission to perform this action (from base).")
-
-    def update(self, request, *args, **kwargs):
-        obj = self.get_object()
-        self.check_object_permissions(request, obj)
-        return super().update(request, *args, **kwargs)
-
-    def destroy(self, request, *args, **kwargs):
-        obj = self.get_object()
-        self.check_object_permissions(request, obj)
-        return super().destroy(request, *args, **kwargs)
-
-
-class PropertyImageViewSet(BaseOwnershipViewSet):
+class PropertyImageViewSet(ModelViewSet):
     serializer_class = PropertyImageSerializer
-    permission_classes = [IsOwnerOrReadOnly, IsHostOrReadOnly]
+    # is authenticated (has per) and is host (has obj per) | readonly
+    permission_classes = [IsHostOrReadOnly]
 
     def get_serializer_context(self):
         return {'property_id': self.kwargs['property_pk']}
@@ -61,14 +29,13 @@ class PropertyImageViewSet(BaseOwnershipViewSet):
         return PropertyImage.objects.filter(property_id=self.kwargs['property_pk'])
 
 
-class PropertyViewSet(BaseOwnershipViewSet):
+class PropertyViewSet(ModelViewSet):
     queryset = Property.objects.prefetch_related('images').all()
     serializer_class = PropertySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly,
-                          IsHostOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsHostOrReadOnly]
     filter_backends = [FilterBackend, SearchFilter, OrderingFilter]
 
-    # pagination_class = DefaultPagination
+    pagination_class = DefaultPagination
     search_fields = ['title', 'description', ]
     ordering_fields = ['price', 'last_update', ]
     # TODO use filterset_class = PropertyFilter instead of filterset_fields
@@ -76,7 +43,9 @@ class PropertyViewSet(BaseOwnershipViewSet):
     filterset_fields = ['category_id']
 
     def get_serializer_context(self):
-        return {'hosted_user_id': self.request.user.profile.id}
+        if self.request.user.is_authenticated:
+            return {'hosted_user_id': self.request.user.profile.id}
+        return super().get_serializer_context()
 
     def destroy(self, request, *args, **kwargs):
         property_obj = self.get_object()
@@ -90,14 +59,16 @@ class PropertyViewSet(BaseOwnershipViewSet):
         # return super().destroy(request, *args, **kwargs)
 
 
-class CollectionViewSet(BaseOwnershipViewSet):
+class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(
         properties_count=Count('properties')).all()
     serializer_class = CollectionSerializer
-    permission_classes = [IsHostOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsHostOrReadOnly]
 
     def get_serializer_context(self):
-        return {'hosted_user_id': self.request.user.profile.id}
+        if self.request.user.is_authenticated:
+            return {'hosted_user_id': self.request.user.profile.id}
+        return super().get_serializer_context()
 
     def destroy(self, request, *args, **kwargs):
         # in deletion ,collection should be not associated with properties otherwise will not delete
@@ -109,6 +80,24 @@ class CollectionViewSet(BaseOwnershipViewSet):
         if collection.properties.count() > 0:
             return Response({'error': 'Collection cannot be deleted because it has more than one property'})
         return super().destroy(request, *args, **kwargs)
+
+
+class ReviewViewSet(ModelViewSet):
+    serializer_class = ReviewSerializer
+    # it include check for is authenticated too
+    permission_classes = [IsAuthenticatedOrReadOnly, IsGuestOrReadOnly]
+
+    # FIXME Update this get_serializer_context , we're using this functionality before we make FK to profile
+    # its same thing :)
+    def get_serializer_context(self):
+        context = {'property_id': self.kwargs['property_pk']}
+        if self.request.user.is_authenticated:
+            context['reviewer_name'] = self.request.user.first_name if self.request.user.first_name else self.request.user.username
+            context['user_profile_id'] = self.request.user.profile.id
+        return context
+
+    def get_queryset(self):
+        return Review.objects.filter(property_id=self.kwargs['property_pk'])
 
 
 class CategoryViewSet(ModelViewSet):
@@ -126,6 +115,7 @@ class CategoryViewSet(ModelViewSet):
             return [AllowAny()]
         elif self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAdminUser()]
+        return super().get_permissions()
 
     def destroy(self, request, *args, **kwargs):
         # in deletion ,category should be not associated with properties otherwise will not delete

@@ -1,7 +1,7 @@
 from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
-from .models import Category, Property, PropertyImage, Collection
+from .models import Category, Property, PropertyImage, Collection, Review
 
 # will use like that `serializer = PropertyImageSerializer(data=image_data, context={'property_id': property.id})`
 
@@ -73,7 +73,7 @@ class SimplePropertySerializer(serializers.ModelSerializer):
 
 
 class CollectionSerializer(serializers.ModelSerializer):
-    # we don't use PropertySerializer  coz we need only fewer data and thats what SimplePropertySerializer do ,
+    # we don't use PropertySerializer  coz we need only fewer data and thats what SimplePropertySerializer have ,
     featured_property = SimplePropertySerializer(
         read_only=True)  # get a specific property
     # lists all properties in the collection
@@ -103,6 +103,45 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'title']
-# class CollectionSerializer(serializers.Serializer):
-#     id = serializers.IntegerField()
-#     title = serializers.CharField(max_length=255)
+
+# TODO : Only one review for property with same (property_pk && user_id)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    reviewer_name = serializers.CharField(read_only=True)
+
+    def validate_rating(self, value):
+        if not (1 <= int(value) <= 5):
+            raise serializers.ValidationError(
+                "Rating must be between 1 and 5.")
+        return value
+
+    def validate(self, data):
+        # Get the property ID from the context
+        property_id = self.context['property_id']
+        user_profile_id = self.context['user_profile_id']
+
+        if self.instance:
+            return data  # when user update review will pass validation otherwise will check
+        # check if  user has already posted a review for a property
+        if Review.objects.filter(property_id=property_id, profile_id=user_profile_id).exists():
+            raise serializers.ValidationError(
+                "You have already posted a review for this property.")
+
+        return data
+    # def create(self, validated_data):
+    #     property_id = self.context['property_id']
+    #     reviewer_name = self.context.get('reviewer_name', 'Unknown')
+    #     return Review.objects.create(property_id=property_id, reviewer_name=reviewer_name, **validated_data)
+
+    # it works for both create/update
+    def save(self, **kwargs):
+        self.validated_data['property_id'] = self.context['property_id']
+        self.validated_data['profile_id'] = self.context['user_profile_id']
+        self.validated_data['reviewer_name'] = self.context.get(
+            'reviewer_name', 'Unknown')
+        return super().save(**kwargs)
+
+    class Meta:
+        model = Review
+        fields = ['id', 'reviewer_name', 'rating', 'description', 'date']

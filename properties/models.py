@@ -89,3 +89,16 @@ class PropertyImage(models.Model):
         upload_to='upload/images',
         # validators=[validate_file_size]
     )
+# every property are already associated with profile user which define is host or guest
+
+
+class Review(models.Model):
+    property = models.ForeignKey(
+        Property, on_delete=models.CASCADE, related_name='reviews')
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name='reviews'
+    )
+    reviewer_name = models.CharField(max_length=255)
+    rating = models.PositiveIntegerField(default=1)
+    description = models.TextField()
+    date = models.DateField(auto_now_add=True)
