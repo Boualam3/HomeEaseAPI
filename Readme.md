@@ -11,7 +11,7 @@ Ensure you have the following installed on your machine:
 docker --version
 ```
 
-similar output :
+example output :
 
 `Docker version 24.0.7, .....`
 
@@ -21,7 +21,7 @@ similar output :
 docker-compose --version
 ```
 
-similar output :
+example output :
 
 `docker-compose version 1.29.2 .....`
 
@@ -101,6 +101,10 @@ curl -X 'POST' \
   "password": "guestpasskey123"
 }'
 ```
+
+both will return refresh and access tokens : eg
+`{"refresh":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcyNjA3MTQyOSwiaWF0IjoxNzI1OTg1MDI5LCJqdGkiOiI0NTQ1OGJmYjEyODY0OTc1OTM5ZjkxY2YwNzEyZGI2MCIsInVzZXJfaWQiOjF9.47mCjeNwxI8AVxyN4OmmXZ3GCsGkGPH74pK4zp5Wnbo","access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI2NTg5ODI5LCJpYXQiOjE3MjU5ODUwMjksImp0aSI6ImIzNmYwZGVlYzdlNzRjNDJhZTRiZjBmOTQ0NTkwNTJiIiwidXNlcl9pZCI6MX0.fZ7OVU379uF0_YFLjdY7kG8JlbPt67EnRK9NKsN1gbQ"}`
+follow the docs for more information [ReDoc] (http://localhost:8000/api/docs/redoc/)
 
 or create your own user by following the documentation here :
 
