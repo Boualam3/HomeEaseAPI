@@ -30,7 +30,7 @@ class Collection(models.Model):
     )
     image = models.ImageField(
         upload_to='upload/collection_images/', null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=False, blank=False)
 
     def __str__(self):
         return self.title
@@ -57,7 +57,7 @@ class Property(models.Model):
         max_length=50, choices=PropertyType.choices
     )
     collection = models.ForeignKey(
-        Collection, on_delete=models.PROTECT, related_name='properties'
+        Collection,  related_name='properties', on_delete=models.SET_NULL, null=True, blank=True
     )
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name='properties', null=True, blank=True
