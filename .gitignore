@@ -1,0 +1,7 @@
+.vscode/
+__pycache__/
+venv/
+.authworkflow.md
+db_tables.pdf
+db.sqlite3
+upload/

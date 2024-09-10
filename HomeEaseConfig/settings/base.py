@@ -158,8 +158,9 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL': True,
 
     'SERIALIZERS': {
-        'user_create': 'core.serializers.CusUserCreateSerializer',
+        'user': 'core.serializers.CusUserSerializer',
         'current_user': 'core.serializers.CusUserSerializer',
+        'user_create': 'core.serializers.CusUserCreateSerializer'
     },
 
     # 'EMAIL': {
