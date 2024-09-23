@@ -27,7 +27,8 @@ from drf_spectacular.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include('core.urls')),
-    path('', include('properties.urls'))
+    path('', include('properties.urls')),
+    path('', include('booking.urls'))
 ]
 
 if settings.DEBUG:

@@ -124,7 +124,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUserList'
+                $ref: '#/components/schemas/PaginatedCusUserList'
           description: ''
     post:
       operationId: auth_users_create
@@ -171,7 +171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/CusUser'
           description: ''
     put:
       operationId: auth_users_update
@@ -188,13 +188,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRequest'
+              $ref: '#/components/schemas/CusUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserRequest'
+              $ref: '#/components/schemas/CusUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserRequest'
+              $ref: '#/components/schemas/CusUserRequest'
         required: true
       security:
       - jwtAuth: []
@@ -203,7 +203,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/CusUser'
           description: ''
     patch:
       operationId: auth_users_partial_update
@@ -220,13 +220,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUserRequest'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUserRequest'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUserRequest'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
       security:
       - jwtAuth: []
       responses:
@@ -234,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/CusUser'
           description: ''
     delete:
       operationId: auth_users_destroy
@@ -1478,6 +1478,8 @@ components:
         last_name:
           type: string
           maxLength: 150
+        profile:
+          $ref: '#/components/schemas/UserProfile'
       required:
       - email
       - id
@@ -1507,6 +1509,8 @@ components:
         last_name:
           type: string
           maxLength: 150
+        profile:
+          $ref: '#/components/schemas/UserProfileRequest'
       required:
       - email
       - password
@@ -1576,6 +1580,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Collection'
+    PaginatedCusUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CusUser'
     PaginatedPropertyImageList:
       type: object
       required:
@@ -1645,29 +1672,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Review'
-    PaginatedUserList:
-      type: object
-      required:
-      - count
-      - results
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
     PasswordResetConfirm:
       type: object
       properties:
@@ -1749,8 +1753,15 @@ components:
           minLength: 1
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
         collection:
           type: integer
+          nullable: true
         category:
           type: integer
           nullable: true
@@ -1767,21 +1778,18 @@ components:
           exclusiveMinimum: true
         number_of_bedrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         number_of_bathrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         property_size:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         amenities:
           type: string
@@ -1789,20 +1797,19 @@ components:
     PatchedReviewRequest:
       type: object
       properties:
+        rating:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
         description:
           type: string
           minLength: 1
-    PatchedUserRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          minLength: 1
-          maxLength: 254
     Profile:
       type: object
       properties:
+        user_id:
+          type: integer
+          readOnly: true
         role:
           $ref: '#/components/schemas/RoleEnum'
         phone_number:
@@ -1825,6 +1832,8 @@ components:
           exclusiveMaximum: true
           exclusiveMinimum: true
           nullable: true
+      required:
+      - user_id
     ProfileRequest:
       type: object
       properties:
@@ -1867,8 +1876,15 @@ components:
           type: string
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
         collection:
           type: integer
+          nullable: true
         category:
           type: integer
           nullable: true
@@ -1884,21 +1900,18 @@ components:
           exclusiveMinimum: true
         number_of_bedrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         number_of_bathrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         property_size:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         amenities:
           type: string
@@ -1909,8 +1922,8 @@ components:
             $ref: '#/components/schemas/PropertyImage'
           readOnly: true
       required:
-      - collection
       - description
+      - from_date
       - id
       - images
       - location
@@ -1918,6 +1931,7 @@ components:
       - property_type
       - slug
       - title
+      - to_date
     PropertyImage:
       type: object
       properties:
@@ -1950,8 +1964,15 @@ components:
           minLength: 1
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
         collection:
           type: integer
+          nullable: true
         category:
           type: integer
           nullable: true
@@ -1968,32 +1989,30 @@ components:
           exclusiveMinimum: true
         number_of_bedrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         number_of_bathrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         property_size:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         amenities:
           type: string
           nullable: true
       required:
-      - collection
       - description
+      - from_date
       - location
       - price
       - property_type
       - title
+      - to_date
     PropertyTypeEnum:
       enum:
       - HOME
@@ -2015,6 +2034,10 @@ components:
         reviewer_name:
           type: string
           readOnly: true
+        rating:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
         description:
           type: string
         date:
@@ -2029,6 +2052,10 @@ components:
     ReviewRequest:
       type: object
       properties:
+        rating:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
         description:
           type: string
           minLength: 1
@@ -2202,35 +2229,55 @@ components:
           minLength: 1
       required:
       - token
-    User:
+    UserProfile:
       type: object
       properties:
-        email:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          default: GUEST
+        phone_number:
           type: string
-          format: email
-          maxLength: 254
-        id:
-          type: integer
-          readOnly: true
-        username:
+          maxLength: 20
+        street:
           type: string
-          readOnly: true
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-      required:
-      - email
-      - id
-      - username
-    UserRequest:
+          maxLength: 225
+        city:
+          type: string
+          maxLength: 225
+        zip:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
+    UserProfileRequest:
       type: object
       properties:
-        email:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          default: GUEST
+        phone_number:
           type: string
-          format: email
           minLength: 1
-          maxLength: 254
-      required:
-      - email
+          maxLength: 20
+        street:
+          type: string
+          minLength: 1
+          maxLength: 225
+        city:
+          type: string
+          minLength: 1
+          maxLength: 225
+        zip:
+          type: number
+          format: double
+          maximum: 1000000
+          minimum: -1000000
+          exclusiveMaximum: true
+          exclusiveMinimum: true
     UsernameResetConfirm:
       type: object
       properties:

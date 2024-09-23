@@ -9,7 +9,15 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      - db
       - smtp4dev
+  db:
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
+
   smtp4dev:
     image: rnwood/smtp4dev:v3
     ports:
@@ -20,4 +28,5 @@ services:
       - smtp4dev-data:/smtp4dev
 
 volumes:
+  postgres_data:
   smtp4dev-data:
