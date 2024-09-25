@@ -1,10 +1,17 @@
 from django.db import models
 
-class Calendar(models.Model) :
-	pass
+from properties.models import Property
 
-class Appointment(models.Model) :
-	pass
+
+class Calendar(models.Model):
+    property = models.OneToOneField(Property, on_delete=models.CASCADE)
+#     opened_dates = models.ArrayField()
+#     locked_dates = models.ArrayField()
+
+
+class Appointment(models.Model):
+    pass
+
 
 class Booking(models.Model):
-	pass
+    pass
