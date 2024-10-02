@@ -1,6 +1,6 @@
-from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer, UserSerializer as BaseUserSerializer
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-from core.constants import LANGUAGES, Role
+# from core.constants import LANGUAGES, Role
 from .models import Profile, User
 
 
@@ -19,12 +19,11 @@ class ProfileSerializer(serializers.ModelSerializer):
     """
 
 
-class CusUserCreateSerializer(BaseUserCreateSerializer):
-    # Optional profile data during registration
+class CusUserCreateSerializer(UserCreateSerializer):
     profile = ProfileSerializer(required=False)
 
-    class Meta(BaseUserCreateSerializer.Meta):
-        fields = BaseUserCreateSerializer.Meta.fields + \
+    class Meta(UserCreateSerializer.Meta):
+        fields = UserCreateSerializer.Meta.fields + \
             ('first_name', 'last_name', 'profile')
 
     def create(self, validated_data):
@@ -44,9 +43,10 @@ class CusUserCreateSerializer(BaseUserCreateSerializer):
         return user
 
     def to_internal_value(self, data):
+        # remove profile data from the posted data of user to ensuring only user data will used to create user object
         profile_data = data.pop('profile', None)
         intern = super().to_internal_value(data)
-        # store profile data temporarily to access to it in create method
+        # store profile data temporarily for access to it in create/update method
         if profile_data:
             self._profile_data = profile_data
 
@@ -61,12 +61,13 @@ class CusUserCreateSerializer(BaseUserCreateSerializer):
         return repr
 
 
-class CusUserSerializer(BaseUserSerializer):
-    profile = ProfileSerializer()
+# TODO : in create method use ProfileSerializer instead of get_or_create for validate data then update ,mention that serializer is for 'me/' endpoints
+class CusUserSerializer(UserSerializer):
+    profile = ProfileSerializer(required=False)
 
-    class Meta(BaseUserSerializer.Meta):
-        fields = ['id', 'username', 'email',
-                  'first_name', 'last_name', 'profile']
+    class Meta(UserCreateSerializer.Meta):
+        fields = UserCreateSerializer.Meta.fields + \
+            ('first_name', 'last_name', 'profile')
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', None)
@@ -85,6 +86,7 @@ class CusUserSerializer(BaseUserSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        profile = ProfileSerializer(instance.profile).data
+        profile = ProfileSerializer(instance.profile).data if hasattr(
+            instance, 'profile') else None
         repr['profile'] = profile
         return repr

@@ -124,7 +124,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUserList'
+                $ref: '#/components/schemas/PaginatedCusUserList'
           description: ''
     post:
       operationId: auth_users_create
@@ -171,7 +171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/CusUser'
           description: ''
     put:
       operationId: auth_users_update
@@ -188,13 +188,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRequest'
+              $ref: '#/components/schemas/CusUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserRequest'
+              $ref: '#/components/schemas/CusUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserRequest'
+              $ref: '#/components/schemas/CusUserRequest'
         required: true
       security:
       - jwtAuth: []
@@ -203,7 +203,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/CusUser'
           description: ''
     patch:
       operationId: auth_users_partial_update
@@ -220,13 +220,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUserRequest'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUserRequest'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUserRequest'
+              $ref: '#/components/schemas/PatchedCusUserRequest'
       security:
       - jwtAuth: []
       responses:
@@ -234,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/CusUser'
           description: ''
     delete:
       operationId: auth_users_destroy
@@ -1367,6 +1367,36 @@ components:
       required:
       - token
       - uid
+    Calendar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_date:
+          type: string
+          format: date
+          readOnly: true
+        to_date:
+          type: string
+          format: date
+          readOnly: true
+        locked_dates: {}
+        property:
+          type: integer
+      required:
+      - from_date
+      - id
+      - property
+      - to_date
+    CalendarRequest:
+      type: object
+      properties:
+        locked_dates: {}
+        property:
+          type: integer
+      required:
+      - property
     Category:
       type: object
       properties:
@@ -1431,18 +1461,22 @@ components:
     CusUser:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        username:
-          type: string
-          readOnly: true
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
         email:
           type: string
           format: email
           maxLength: 254
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          maxLength: 128
         first_name:
           type: string
           maxLength: 150
@@ -1454,30 +1488,32 @@ components:
       required:
       - email
       - id
-      - profile
+      - password
       - username
     CusUserCreate:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
         username:
           type: string
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
           pattern: ^[\w.@+-]+$
           maxLength: 150
-        email:
-          type: string
-          format: email
-          maxLength: 254
+        id:
+          type: integer
+          readOnly: true
         first_name:
           type: string
           maxLength: 150
         last_name:
           type: string
           maxLength: 150
+        profile:
+          $ref: '#/components/schemas/Profile'
       required:
       - email
       - id
@@ -1485,6 +1521,11 @@ components:
     CusUserCreateRequest:
       type: object
       properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
         username:
           type: string
           minLength: 1
@@ -1492,11 +1533,6 @@ components:
             only.
           pattern: ^[\w.@+-]+$
           maxLength: 150
-        email:
-          type: string
-          format: email
-          minLength: 1
-          maxLength: 254
         password:
           type: string
           writeOnly: true
@@ -1507,6 +1543,8 @@ components:
         last_name:
           type: string
           maxLength: 150
+        profile:
+          $ref: '#/components/schemas/ProfileRequest'
       required:
       - email
       - password
@@ -1519,6 +1557,17 @@ components:
           format: email
           minLength: 1
           maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          minLength: 1
+          maxLength: 128
         first_name:
           type: string
           maxLength: 150
@@ -1529,7 +1578,20 @@ components:
           $ref: '#/components/schemas/ProfileRequest'
       required:
       - email
-      - profile
+      - password
+      - username
+    LanguagesEnum:
+      enum:
+      - AR
+      - EN
+      - FR
+      - ES
+      type: string
+      description: |-
+        * `AR` - Arabic
+        * `EN` - English
+        * `FR` - French
+        * `ES` - Spanish
     PaginatedCategoryList:
       type: object
       required:
@@ -1576,6 +1638,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Collection'
+    PaginatedCusUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CusUser'
     PaginatedPropertyImageList:
       type: object
       required:
@@ -1645,29 +1730,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Review'
-    PaginatedUserList:
-      type: object
-      required:
-      - count
-      - results
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
     PasswordResetConfirm:
       type: object
       properties:
@@ -1723,6 +1785,17 @@ components:
           format: email
           minLength: 1
           maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          minLength: 1
+          maxLength: 128
         first_name:
           type: string
           maxLength: 150
@@ -1749,8 +1822,11 @@ components:
           minLength: 1
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
+        calendar:
+          $ref: '#/components/schemas/CalendarRequest'
         collection:
           type: integer
+          nullable: true
         category:
           type: integer
           nullable: true
@@ -1767,39 +1843,36 @@ components:
           exclusiveMinimum: true
         number_of_bedrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         number_of_bathrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         property_size:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         amenities:
-          type: string
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 15
           nullable: true
     PatchedReviewRequest:
       type: object
       properties:
+        rating:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
         description:
           type: string
           minLength: 1
-    PatchedUserRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          minLength: 1
-          maxLength: 254
     Profile:
       type: object
       properties:
@@ -1817,14 +1890,10 @@ components:
           type: string
           nullable: true
           maxLength: 225
-        zip:
-          type: number
-          format: double
-          maximum: 1000000
-          minimum: -1000000
-          exclusiveMaximum: true
-          exclusiveMinimum: true
-          nullable: true
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguagesEnum'
     ProfileRequest:
       type: object
       properties:
@@ -1842,14 +1911,10 @@ components:
           type: string
           nullable: true
           maxLength: 225
-        zip:
-          type: number
-          format: double
-          maximum: 1000000
-          minimum: -1000000
-          exclusiveMaximum: true
-          exclusiveMinimum: true
-          nullable: true
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguagesEnum'
     Property:
       type: object
       properties:
@@ -1867,8 +1932,11 @@ components:
           type: string
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
+        calendar:
+          $ref: '#/components/schemas/Calendar'
         collection:
           type: integer
+          nullable: true
         category:
           type: integer
           nullable: true
@@ -1884,24 +1952,24 @@ components:
           exclusiveMinimum: true
         number_of_bedrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         number_of_bathrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         property_size:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         amenities:
-          type: string
+          type: array
+          items:
+            type: string
+            maxLength: 15
           nullable: true
         images:
           type: array
@@ -1909,7 +1977,6 @@ components:
             $ref: '#/components/schemas/PropertyImage'
           readOnly: true
       required:
-      - collection
       - description
       - id
       - images
@@ -1950,8 +2017,11 @@ components:
           minLength: 1
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
+        calendar:
+          $ref: '#/components/schemas/CalendarRequest'
         collection:
           type: integer
+          nullable: true
         category:
           type: integer
           nullable: true
@@ -1968,27 +2038,27 @@ components:
           exclusiveMinimum: true
         number_of_bedrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         number_of_bathrooms:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         property_size:
           type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
+          maximum: 2147483647
+          minimum: -2147483648
           nullable: true
         amenities:
-          type: string
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 15
           nullable: true
       required:
-      - collection
       - description
       - location
       - price
@@ -2015,6 +2085,10 @@ components:
         reviewer_name:
           type: string
           readOnly: true
+        rating:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
         description:
           type: string
         date:
@@ -2029,6 +2103,10 @@ components:
     ReviewRequest:
       type: object
       properties:
+        rating:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
         description:
           type: string
           minLength: 1
@@ -2202,35 +2280,6 @@ components:
           minLength: 1
       required:
       - token
-    User:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          maxLength: 254
-        id:
-          type: integer
-          readOnly: true
-        username:
-          type: string
-          readOnly: true
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
-      required:
-      - email
-      - id
-      - username
-    UserRequest:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          minLength: 1
-          maxLength: 254
-      required:
-      - email
     UsernameResetConfirm:
       type: object
       properties:

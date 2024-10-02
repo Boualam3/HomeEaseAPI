@@ -2,6 +2,7 @@ from core.models import Profile
 from django.utils.text import slugify
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
 
 
 def validate_file_size(file):
@@ -69,10 +70,11 @@ class Property(models.Model):
     number_of_bathrooms = models.IntegerField(null=True, blank=True)
     property_size = models.IntegerField(
         null=True, blank=True)  # in square feet or meters
-    amenities = models.TextField(null=True, blank=True)  # list of amenities
-    availability = models.BooleanField(default=False)  # deactivated
-    from_date = models.DateField(auto_now_add=True)
-    to_date = models.DateField(auto_now_add=True)
+    amenities = ArrayField(models.CharField(
+        max_length=15), null=True)  # list of amenities
+    # availability = models.BooleanField(default=False)  # deactivated
+    # from_date = models.DateField(auto_now_add=True)
+    # to_date = models.DateField(auto_now_add=True)
     number_of_guests = models.IntegerField(null=True, blank=True)
     last_update = models.DateTimeField(auto_now_add=True)
 

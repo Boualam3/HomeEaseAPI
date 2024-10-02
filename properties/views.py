@@ -1,3 +1,4 @@
+from multiprocessing import context
 from urllib import request
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
@@ -46,6 +47,9 @@ class PropertyViewSet(ModelViewSet):
         if self.request.user.is_authenticated:
             return {'hosted_user_id': self.request.user.profile.id}
         return super().get_serializer_context()
+
+    # def get_serializer(self, *args, **kwargs):
+    #     return PropertySerializer(self.queryset, context={'request': self.request})
 
     def destroy(self, request, *args, **kwargs):
         property_obj = self.get_object()
