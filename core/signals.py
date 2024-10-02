@@ -1,23 +1,24 @@
-"""
-JUST FOR RESOURCE PURPOSE 
-I WAS USE THAT TO CREATE PROFILE OBJECT  WHENEVER USER REGISTERED `POST SAVE` BUT ITS NOT BETTER APPROACH 
+# from django.dispatch import receiver
 
-from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+# from core.serializers import ProfileSerializer
+# from rest_framework.exceptions import ValidationError
+# from .models import Profile
 
-from .models import Profile
+# # from .serializers import UserProfileSerializer
+# from djoser.signals import user_registered
 
+# If we wan to use this signal then we need to make request.data dict Mutable for add profile_data into it coz request is immuable object
+# @receiver(user_registered)
+# def create_user_profile(sender, user, request, **kwargs):
 
-# when user is created ,so profile object will created
+#     profile_data = request.data.get('profile', {})
+#     if profile_data:
+#         ps = ProfileSerializer(data=profile_data, context={'user': user})
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_profile_for_new_user(sender,  instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-
-#! This code above  is not called directly we need to override function (ready) in apps class (apps.py)
-then  we import  `core.signals` , it will be called 
-"""
+#         if ps.is_valid():
+#             ps.save(user=user)
+#         else:
+#             raise ValidationError(f"Invalid profile data: {ps.errors}")
+#     else:
+#         # otherwise create profile n associate it with user
+#         Profile.objects.create(user=user)
