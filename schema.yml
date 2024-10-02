@@ -1367,6 +1367,36 @@ components:
       required:
       - token
       - uid
+    Calendar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_date:
+          type: string
+          format: date
+          readOnly: true
+        to_date:
+          type: string
+          format: date
+          readOnly: true
+        locked_dates: {}
+        property:
+          type: integer
+      required:
+      - from_date
+      - id
+      - property
+      - to_date
+    CalendarRequest:
+      type: object
+      properties:
+        locked_dates: {}
+        property:
+          type: integer
+      required:
+      - property
     Category:
       type: object
       properties:
@@ -1431,18 +1461,22 @@ components:
     CusUser:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        username:
-          type: string
-          readOnly: true
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-            only.
         email:
           type: string
           format: email
           maxLength: 254
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          maxLength: 128
         first_name:
           type: string
           maxLength: 150
@@ -1454,24 +1488,24 @@ components:
       required:
       - email
       - id
-      - profile
+      - password
       - username
     CusUserCreate:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
         username:
           type: string
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
           pattern: ^[\w.@+-]+$
           maxLength: 150
-        email:
-          type: string
-          format: email
-          maxLength: 254
+        id:
+          type: integer
+          readOnly: true
         first_name:
           type: string
           maxLength: 150
@@ -1479,7 +1513,7 @@ components:
           type: string
           maxLength: 150
         profile:
-          $ref: '#/components/schemas/UserProfile'
+          $ref: '#/components/schemas/Profile'
       required:
       - email
       - id
@@ -1487,6 +1521,11 @@ components:
     CusUserCreateRequest:
       type: object
       properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
         username:
           type: string
           minLength: 1
@@ -1494,11 +1533,6 @@ components:
             only.
           pattern: ^[\w.@+-]+$
           maxLength: 150
-        email:
-          type: string
-          format: email
-          minLength: 1
-          maxLength: 254
         password:
           type: string
           writeOnly: true
@@ -1510,7 +1544,7 @@ components:
           type: string
           maxLength: 150
         profile:
-          $ref: '#/components/schemas/UserProfileRequest'
+          $ref: '#/components/schemas/ProfileRequest'
       required:
       - email
       - password
@@ -1523,6 +1557,17 @@ components:
           format: email
           minLength: 1
           maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          minLength: 1
+          maxLength: 128
         first_name:
           type: string
           maxLength: 150
@@ -1533,7 +1578,20 @@ components:
           $ref: '#/components/schemas/ProfileRequest'
       required:
       - email
-      - profile
+      - password
+      - username
+    LanguagesEnum:
+      enum:
+      - AR
+      - EN
+      - FR
+      - ES
+      type: string
+      description: |-
+        * `AR` - Arabic
+        * `EN` - English
+        * `FR` - French
+        * `ES` - Spanish
     PaginatedCategoryList:
       type: object
       required:
@@ -1727,6 +1785,17 @@ components:
           format: email
           minLength: 1
           maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          minLength: 1
+          maxLength: 128
         first_name:
           type: string
           maxLength: 150
@@ -1753,12 +1822,8 @@ components:
           minLength: 1
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
-        from_date:
-          type: string
-          format: date
-        to_date:
-          type: string
-          format: date
+        calendar:
+          $ref: '#/components/schemas/CalendarRequest'
         collection:
           type: integer
           nullable: true
@@ -1792,7 +1857,11 @@ components:
           minimum: -2147483648
           nullable: true
         amenities:
-          type: string
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 15
           nullable: true
     PatchedReviewRequest:
       type: object
@@ -1807,9 +1876,6 @@ components:
     Profile:
       type: object
       properties:
-        user_id:
-          type: integer
-          readOnly: true
         role:
           $ref: '#/components/schemas/RoleEnum'
         phone_number:
@@ -1824,16 +1890,10 @@ components:
           type: string
           nullable: true
           maxLength: 225
-        zip:
-          type: number
-          format: double
-          maximum: 1000000
-          minimum: -1000000
-          exclusiveMaximum: true
-          exclusiveMinimum: true
-          nullable: true
-      required:
-      - user_id
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguagesEnum'
     ProfileRequest:
       type: object
       properties:
@@ -1851,14 +1911,10 @@ components:
           type: string
           nullable: true
           maxLength: 225
-        zip:
-          type: number
-          format: double
-          maximum: 1000000
-          minimum: -1000000
-          exclusiveMaximum: true
-          exclusiveMinimum: true
-          nullable: true
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguagesEnum'
     Property:
       type: object
       properties:
@@ -1876,12 +1932,8 @@ components:
           type: string
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
-        from_date:
-          type: string
-          format: date
-        to_date:
-          type: string
-          format: date
+        calendar:
+          $ref: '#/components/schemas/Calendar'
         collection:
           type: integer
           nullable: true
@@ -1914,7 +1966,10 @@ components:
           minimum: -2147483648
           nullable: true
         amenities:
-          type: string
+          type: array
+          items:
+            type: string
+            maxLength: 15
           nullable: true
         images:
           type: array
@@ -1923,7 +1978,6 @@ components:
           readOnly: true
       required:
       - description
-      - from_date
       - id
       - images
       - location
@@ -1931,7 +1985,6 @@ components:
       - property_type
       - slug
       - title
-      - to_date
     PropertyImage:
       type: object
       properties:
@@ -1964,12 +2017,8 @@ components:
           minLength: 1
         property_type:
           $ref: '#/components/schemas/PropertyTypeEnum'
-        from_date:
-          type: string
-          format: date
-        to_date:
-          type: string
-          format: date
+        calendar:
+          $ref: '#/components/schemas/CalendarRequest'
         collection:
           type: integer
           nullable: true
@@ -2003,16 +2052,18 @@ components:
           minimum: -2147483648
           nullable: true
         amenities:
-          type: string
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 15
           nullable: true
       required:
       - description
-      - from_date
       - location
       - price
       - property_type
       - title
-      - to_date
     PropertyTypeEnum:
       enum:
       - HOME
@@ -2229,55 +2280,6 @@ components:
           minLength: 1
       required:
       - token
-    UserProfile:
-      type: object
-      properties:
-        role:
-          allOf:
-          - $ref: '#/components/schemas/RoleEnum'
-          default: GUEST
-        phone_number:
-          type: string
-          maxLength: 20
-        street:
-          type: string
-          maxLength: 225
-        city:
-          type: string
-          maxLength: 225
-        zip:
-          type: number
-          format: double
-          maximum: 1000000
-          minimum: -1000000
-          exclusiveMaximum: true
-          exclusiveMinimum: true
-    UserProfileRequest:
-      type: object
-      properties:
-        role:
-          allOf:
-          - $ref: '#/components/schemas/RoleEnum'
-          default: GUEST
-        phone_number:
-          type: string
-          minLength: 1
-          maxLength: 20
-        street:
-          type: string
-          minLength: 1
-          maxLength: 225
-        city:
-          type: string
-          minLength: 1
-          maxLength: 225
-        zip:
-          type: number
-          format: double
-          maximum: 1000000
-          minimum: -1000000
-          exclusiveMaximum: true
-          exclusiveMinimum: true
     UsernameResetConfirm:
       type: object
       properties:

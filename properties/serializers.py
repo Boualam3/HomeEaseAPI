@@ -1,6 +1,9 @@
 from django.utils.text import slugify
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
+
+from booking.models import Calendar
+from booking.serializers import CalendarSerializer
 from .models import Category, Property, PropertyImage, Collection, Review
 
 # will use like that `serializer = PropertyImageSerializer(data=image_data, context={'property_id': property.id})`
@@ -17,11 +20,16 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image']
 
 
+"""
+FIXME complete the following 
+-1- modify create method to handle calendar object like we've do in user&profile
+-2- update CalendarSerializer 
+-2- add validation in CalendarSerializer
+"""
+
+
 class PropertySerializer(serializers.ModelSerializer):
-    from_date = serializers.DateField(
-        format="%Y-%m-%d", input_formats=["%Y-%m-%d", "%d-%m-%Y"])
-    to_date = serializers.DateField(
-        format="%Y-%m-%d", input_formats=["%Y-%m-%d", "%d-%m-%Y"])
+    calendar = CalendarSerializer(required=False)
 
     # many list queryset , read only for get request
     images = PropertyImageSerializer(many=True, read_only=True)
@@ -34,8 +42,7 @@ class PropertySerializer(serializers.ModelSerializer):
             'title',
             'description',
             'property_type',
-            'from_date',
-            'to_date',
+            'calendar',
             'collection',
             'category',
             'location',
@@ -60,23 +67,46 @@ class PropertySerializer(serializers.ModelSerializer):
                 detail="You do not have permission to use this collection for the property."
             )
 
-        # validate to_date , at least one day after from_date
-        if to_date and from_date and to_date <= from_date:
-            raise serializers.ValidationError({
-                'to_date': "The 'to_date' must be at least one day after 'from_date'."
-            })
+        # # validate to_date , at least one day after from_date
+        # if to_date and from_date and to_date <= from_date:
+        #     raise serializers.ValidationError({
+        #         'to_date': "The 'to_date' must be at least one day after 'from_date'."
+        #     })
 
         return data
 
     def create(self, validated_data):
-        hosted_user_id = self.context['hosted_user_id']
-        return Property.objects.create(host_id=hosted_user_id, **validated_data)
+        # add host_id to validated data
+        validated_data['host_id'] = self.context['hosted_user_id']
+        calendar_data = getattr(self, '_calendar', None)
+        property = super().create(validated_data)
+        if calendar_data:
+            calendar = CalendarSerializer(data=calendar_data, context={
+                                          'property_id': property.id})
+            if calendar.is_valid():
+                calendar.create(calendar_data)
+        else:
+            Calendar.objects.create(property=property)
+        return property
 
     def update(self, instance, validated_data):
         # update slug only when title get changed
         if 'title' in validated_data and validated_data['title'] != instance.title:
             validated_data['slug'] = slugify(validated_data['title'])
         return super().update(instance, validated_data)
+
+    def to_internal_value(self, data):
+        calendar_data = data.pop('calendar', None)
+        if calendar_data:
+            self._calendar = calendar_data
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        calendar = CalendarSerializer(instance.calendar).data if hasattr(
+            instance, 'calendar') else None
+        repr['calendar'] = calendar
+        return repr
 
 
 class SimplePropertySerializer(serializers.ModelSerializer):
@@ -87,7 +117,7 @@ class SimplePropertySerializer(serializers.ModelSerializer):
 
 
 class CollectionSerializer(serializers.ModelSerializer):
-    # we don't use PropertySerializer  coz we need only fewer data and thats what SimplePropertySerializer do 
+    # we don't use PropertySerializer  coz we need only fewer data and thats what SimplePropertySerializer do
     featured_property = SimplePropertySerializer(
         read_only=True)  # get a specific property
     # lists all properties in the collection

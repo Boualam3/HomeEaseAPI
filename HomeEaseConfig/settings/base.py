@@ -155,13 +155,13 @@ SIMPLE_JWT = {
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': 'activate/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': True,
+    # 'ACTIVATION_URL': 'activate/{uid}/{token}',
+    # 'SEND_ACTIVATION_EMAIL': True,
 
     'SERIALIZERS': {
         'user': 'core.serializers.CusUserSerializer',
-        'current_user': 'core.serializers.CusUserSerializer',
-        'user_create': 'core.serializers.CusUserCreateSerializer'
+        'current_user': 'core.serializers.CusUserSerializer',#me endpoints
+        'user_create': 'core.serializers.CusUserCreateSerializer'#auth/users/ post
     },
 
     # 'EMAIL': {
