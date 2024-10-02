@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
+
+from core.constants import LANGUAGES, Role
 
 
 class User(AbstractUser):
@@ -8,27 +11,30 @@ class User(AbstractUser):
 
 
 class Profile(models.Model):
-    class Role(models.TextChoices):
-        HOST = 'HOST', 'Host'
-        GUEST = 'GUEST', 'Guest'
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, null=True, blank=True)
     role = models.CharField(
         max_length=10, choices=Role.choices, default=Role.GUEST)
+    languages = ArrayField(
+        models.CharField(
+            max_length=10, choices=LANGUAGES.choices
+        ),
+        default=LANGUAGES.default_language
+        # size=5,
+    )
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     street = models.CharField(max_length=225, blank=True, null=True)
     city = models.CharField(max_length=225, blank=True, null=True)
-    zip = models.DecimalField(
-        decimal_places=0, max_digits=6, blank=True, null=True)
 
     def __str__(self):
         return f"{self.role}: {self.user.username}"
 
-# I don't think user will need many addresses to link with their profile , if so uncomment this model
-# class Address(models.Model):
-#     street = models.CharField(max_length=225)
-#     city = models.CharField(max_length=225)
-#     zip = models.DecimalField(decimal_places=0, max_digits=6)
+
+# class Payment(models.Model):
+#     card_id = models.CharField(max_length=225)
+#     card_placeholder = models.CharField(max_length=225)
+#     card_cvv = models.DecimalField(decimal_places=0, max_digits=6)
+#     card_expired_date = models.DateField()
 #     profile = models.OneToOneField(
 #         Profile, on_delete=models.CASCADE, primary_key=True
 #     )
